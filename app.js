@@ -1,5 +1,5 @@
 const STORAGE_KEY = "road-to-level-up-mvp-v1";
-const APP_VERSION = "road-level-up-pwa1";
+const APP_VERSION = "road-level-up-pwa3";
 
 const levelTable = [
   { level: 1, exp: 0 },
@@ -70,53 +70,95 @@ const projectSeeds = {
 
 const quests = {
   english: [
-    q("en-1min", "1分話す", 10, "小さい行動"),
-    q("en-3min", "3分話す", 25, "通常練習"),
-    q("en-record", "録音する", 10, "小さい行動"),
-    q("en-input", "話した内容をアプリに入力する", 10, "小さい行動"),
-    q("en-prompt", "添削用プロンプトを生成する", 10, "振り返り・改善"),
-    q("en-result", "ChatGPTなどで添削した結果を記録する", 20, "振り返り・改善"),
-    q("en-improve", "改善点を1つ書く", 15, "振り返り・改善"),
-    q("en-revised", "添削後の修正文を保存する", 20, "振り返り・改善"),
-    q("en-retry", "添削後に言い直す", 40, "通常練習"),
-    q("en-70", "採点70点以上を記録する", 30, "振り返り・改善"),
-    q("en-up", "前回より点数が上がる", 50, "振り返り・改善")
+    q("english_open_log", "英語ログ画面を開く", 3, "preparation", "preparation", 1),
+    q("english_choose_topic", "英語で話すテーマを1つ決める", 10, "preparation", "preparation", 5),
+    q("english_read_aloud_3", "音読を3分する", 10, "skill", "corePractice", 3, { requiresVoice: true, isCore: true }),
+    q("english_shadowing_3", "シャドーイングを3分する", 15, "skill", "corePractice", 3, { requiresVoice: true, isCore: true }),
+    q("english_speak_1", "英語で1分話す", 15, "skill", "corePractice", 1, { requiresVoice: true, isCore: true }),
+    q("english_read_corrected_text", "前回の修正文を音読する", 15, "review", "corePractice", 3, { requiresVoice: true, isCore: true }),
+    q("english_speech_3", "3分スピーチをする", 25, "skill", "normal", 3, { requiresVoice: true }),
+    q("english_log_spoken_text", "話した内容を英語ログに入力する", 10, "skill", "normal", 5),
+    q("english_generate_prompt", "添削用プロンプトを生成する", 10, "review", "reflection", 3),
+    q("english_save_correction", "添削結果と修正文を保存する", 20, "review", "reflection", 5),
+    q("english_write_improvement", "改善点を1つ書く", 15, "review", "reflection", 5),
+    q("english_respeak_corrected", "添削後に言い直す", 40, "review", "reflection", 5, { requiresVoice: true }),
+    q("english_score_70", "採点70点以上を記録する", 30, "review", "reflection", 3)
   ],
   guitar: [
-    q("gt-touch", "ギターを出して触る", 5, "小さい行動"),
-    q("gt-tune", "チューニングする", 10, "小さい行動"),
-    q("gt-warmup", "5分指慣らし", 10, "小さい行動"),
-    q("gt-doremi", "ドレミ練習", 15, "通常練習"),
-    q("gt-code", "コード1つ練習", 20, "通常練習"),
-    q("gt-metronome", "メトロノーム使用", 25, "通常練習"),
-    q("gt-phrase", "1フレーズ練習", 30, "通常練習"),
-    q("gt-record", "録音して確認", 40, "振り返り・改善"),
-    q("gt-better", "昨日よりミスが減る", 50, "振り返り・改善")
+    q("guitar_take_out", "ギターを出す", 3, "preparation", "preparation", 1, { requiresHome: true }),
+    q("guitar_tuning", "チューニングする", 5, "preparation", "preparation", 3, { requiresHome: true, requiresSound: true }),
+    q("guitar_doremi", "ドレミをゆっくり弾く", 10, "skill", "corePractice", 5, { requiresHome: true, requiresSound: true, isCore: true }),
+    q("guitar_c_chord", "Cコードを練習する", 10, "skill", "corePractice", 5, { requiresHome: true, requiresSound: true, isCore: true }),
+    q("guitar_g_chord", "Gコードを練習する", 10, "skill", "corePractice", 5, { requiresHome: true, requiresSound: true, isCore: true }),
+    q("guitar_em_chord", "Emコードを練習する", 10, "skill", "corePractice", 5, { requiresHome: true, requiresSound: true, isCore: true }),
+    q("guitar_chord_change_c_g", "C→Gのコードチェンジを練習する", 15, "skill", "corePractice", 5, { requiresHome: true, requiresSound: true, isCore: true }),
+    q("guitar_metronome_1", "ゆっくりメトロノームに合わせて1分弾く", 20, "skill", "corePractice", 3, { requiresHome: true, requiresSound: true, isCore: true }),
+    q("guitar_phrase_practice", "曲の一部フレーズを練習する", 30, "skill", "normal", 15, { requiresHome: true, requiresSound: true }),
+    q("guitar_ready_to_rock_part", "Ready to Rockの一部を練習する", 40, "skill", "normal", 20, { requiresHome: true, requiresSound: true }),
+    q("guitar_record_check", "演奏を録音して確認する", 40, "review", "reflection", 10, { requiresHome: true, requiresSound: true }),
+    q("guitar_mistake_note", "ミスしたところを1つメモする", 20, "review", "reflection", 5)
   ],
   illustration: [
-    q("il-5min", "5分描く", 10, "小さい行動"),
-    q("il-copy", "模写10分", 20, "通常練習"),
-    q("il-memory", "見た後に資料なしで再現", 35, "通常練習"),
-    q("il-face", "表情3種類", 30, "通常練習"),
-    q("il-pose", "ポーズ練習", 30, "通常練習"),
-    q("il-oc", "オリキャラ案1つ", 50, "通常練習"),
-    q("il-image", "画像ログを保存する", 10, "小さい行動"),
-    q("il-improve", "改善点を1つ書く", 30, "振り返り・改善"),
-    q("il-compare", "1週間前の絵と比較する", 50, "振り返り・改善")
+    q("illust_prepare_tools", "描く道具を準備する", 3, "preparation", "preparation", 1),
+    q("illust_choose_reference", "参考資料を1つ選ぶ", 5, "preparation", "preparation", 3),
+    q("illust_line_3", "線練習を3分する", 10, "skill", "corePractice", 3, { isCore: true }),
+    q("illust_shapes", "丸・箱・円柱を描く", 10, "skill", "corePractice", 5, { isCore: true }),
+    q("illust_face_ratio", "顔の比率を練習する", 15, "skill", "corePractice", 5, { isCore: true }),
+    q("illust_expression_1", "表情を1つ描く", 15, "skill", "corePractice", 5, { isCore: true }),
+    q("illust_gesture", "ジェスチャー練習をする", 15, "skill", "corePractice", 5, { isCore: true }),
+    q("illust_memory_redraw", "資料を見た後に、見ないで再現する", 25, "skill", "corePractice", 10, { isCore: true }),
+    q("illust_original_character_rough", "オリキャラのラフを描く", 50, "skill", "normal", 20),
+    q("illust_pose_practice", "ポーズ練習をする", 30, "skill", "normal", 15),
+    q("illust_save_image_log", "画像ログを保存する", 10, "review", "reflection", 3),
+    q("illust_write_improvement", "改善点を1つ書く", 30, "review", "reflection", 5),
+    q("illust_compare_week", "1週間前の絵と比較する", 50, "review", "reflection", 10)
   ],
   threeD: [
-    q("3d-open", "Blenderを開く", 5, "小さい行動"),
-    q("3d-5min", "5分触る", 10, "小さい行動"),
-    q("3d-shortcut", "ショートカットを1つ練習する", 10, "小さい行動"),
-    q("3d-tutorial", "チュートリアルを10分進める", 20, "通常練習"),
-    q("3d-shape", "基本形状を1つ作る", 20, "通常練習"),
-    q("3d-object", "小物を1つ完成させる", 50, "通常練習"),
-    q("3d-material", "マテリアルを設定する", 25, "通常練習"),
-    q("3d-light", "ライティングを調整する", 25, "通常練習"),
-    q("3d-render", "レンダリングする", 30, "通常練習"),
-    q("3d-image", "スクショを画像ログに保存する", 10, "小さい行動"),
-    q("3d-improve", "改善点を1つ書く", 30, "振り返り・改善")
+    q("modeling_open_blender", "Blenderを開く", 3, "preparation", "preparation", 1, { requiresHome: true }),
+    q("modeling_open_previous_file", "前回ファイルを開く", 5, "preparation", "preparation", 3, { requiresHome: true }),
+    q("modeling_transform", "移動・回転・拡大縮小を練習する", 10, "skill", "corePractice", 5, { requiresHome: true, isCore: true }),
+    q("modeling_basic_shape", "基本形状を1つ作る", 10, "skill", "corePractice", 5, { requiresHome: true, isCore: true }),
+    q("modeling_extrude", "Extrudeを練習する", 15, "skill", "corePractice", 5, { requiresHome: true, isCore: true }),
+    q("modeling_bevel", "Bevelを練習する", 15, "skill", "corePractice", 5, { requiresHome: true, isCore: true }),
+    q("modeling_loop_cut", "Loop Cutを練習する", 15, "skill", "corePractice", 5, { requiresHome: true, isCore: true }),
+    q("modeling_make_small_object", "小物を1つ作る", 50, "skill", "normal", 30, { requiresHome: true, isHeavyTask: true }),
+    q("modeling_material", "マテリアルを設定する", 25, "skill", "normal", 15, { requiresHome: true }),
+    q("modeling_save_screenshot", "スクショを画像ログに保存する", 10, "review", "reflection", 3),
+    q("modeling_write_improvement", "改善点を1つ書く", 30, "review", "reflection", 5)
   ]
+};
+
+const legacyQuestAliases = {
+  "en-1min": "english_speak_1",
+  "en-3min": "english_speech_3",
+  "en-input": "english_log_spoken_text",
+  "en-prompt": "english_generate_prompt",
+  "en-result": "english_save_correction",
+  "en-improve": "english_write_improvement",
+  "en-revised": "english_save_correction",
+  "en-retry": "english_respeak_corrected",
+  "en-70": "english_score_70",
+  "gt-touch": "guitar_take_out",
+  "gt-tune": "guitar_tuning",
+  "gt-doremi": "guitar_doremi",
+  "gt-code": "guitar_c_chord",
+  "gt-metronome": "guitar_metronome_1",
+  "gt-phrase": "guitar_phrase_practice",
+  "gt-record": "guitar_record_check",
+  "il-5min": "illust_line_3",
+  "il-copy": "illust_shapes",
+  "il-face": "illust_expression_1",
+  "il-pose": "illust_pose_practice",
+  "il-oc": "illust_original_character_rough",
+  "il-image": "illust_save_image_log",
+  "il-improve": "illust_write_improvement",
+  "il-compare": "illust_compare_week",
+  "3d-open": "modeling_open_blender",
+  "3d-shape": "modeling_basic_shape",
+  "3d-object": "modeling_make_small_object",
+  "3d-material": "modeling_material",
+  "3d-image": "modeling_save_screenshot",
+  "3d-improve": "modeling_write_improvement"
 };
 
 const managerComments = {
@@ -136,26 +178,26 @@ const ratingLabels = {
 };
 
 const nowSupplementalQuests = [
-  nowQ("english_topic_1", "英語で話したいテーマを1つ決める", "english", 5, 10, "preparation"),
-  nowQ("english_draft_3_sentences", "英語スピーチの下書きを3文書く", "english", 10, 15, "preparation"),
-  nowQ("english_review_correction", "英語の添削結果を見直す", "english", 10, 15, "review"),
-  nowQ("now-tomorrow-prep", "明日の準備だけ", "english", 5, 5, "review"),
-  nowQ("now-quest-review", "クエスト整理", "english", 5, 5, "review")
+  nowQ("english_topic_1", "英語で話したいテーマを1つ決める", "english", 5, 10, "preparation", "preparation"),
+  nowQ("english_draft_3_sentences", "英語スピーチの下書きを3文書く", "english", 10, 15, "preparation", "preparation"),
+  nowQ("english_review_correction", "英語の添削結果を見直す", "english", 10, 15, "review", "reflection"),
+  nowQ("now-tomorrow-prep", "明日の準備だけ", "english", 5, 5, "review", "preparation"),
+  nowQ("now-quest-review", "クエスト整理", "english", 5, 5, "review", "reflection")
 ];
 
 const outsideProjectQuests = [
-  projectQ("thesis_read_pdf_15", "卒論PDFを15分読む", "graduation_thesis", "project", 20, 15, { requiresOfflineMaterials: true }),
-  projectQ("thesis_make_3_notes", "文献メモを3つ作る", "graduation_thesis", "project", 25, 15, { requiresOfflineMaterials: true }),
-  projectQ("thesis_quote_candidate", "引用候補を1つメモする", "graduation_thesis", "project", 15, 10, { requiresOfflineMaterials: true }),
-  projectQ("thesis_next_task", "卒論で次にやることを1つ決める", "graduation_thesis", "memo", 10, 5),
-  projectQ("thesis_question_memo", "先生に聞きたいことをメモする", "graduation_thesis", "memo", 10, 5),
-  projectQ("thesis_chapter_idea", "章立てのアイデアを書く", "graduation_thesis", "memo", 15, 10),
-  projectQ("novel_ideas_3", "小説のネタを3つ書く", "novel", "memo", 15, 10),
-  projectQ("novel_lines_5", "キャラクターの台詞を5つメモする", "novel", "memo", 20, 15),
-  projectQ("novel_scene_memo", "シーンの断片を1つ書く", "novel", "project", 20, 15),
-  projectQ("novel_world_setting", "世界観設定を1つ書く", "novel", "memo", 15, 10),
-  projectQ("novel_opening_idea", "第一章の導入案を書く", "novel", "project", 20, 15),
-  projectQ("novel_title_candidates", "タイトル候補を書く", "novel", "memo", 10, 5)
+  projectQ("thesis_read_pdf_15", "卒論PDFを15分読む", "graduation_thesis", "project", "normal", 20, 15, { requiresOfflineMaterials: true }),
+  projectQ("thesis_make_3_notes", "文献メモを3つ作る", "graduation_thesis", "project", "normal", 25, 15, { requiresOfflineMaterials: true }),
+  projectQ("thesis_quote_candidate", "引用候補を1つメモする", "graduation_thesis", "project", "reflection", 15, 10, { requiresOfflineMaterials: true }),
+  projectQ("thesis_next_task", "卒論で次にやることを1つ決める", "graduation_thesis", "memo", "preparation", 10, 5),
+  projectQ("thesis_question_memo", "先生に聞きたいことをメモする", "graduation_thesis", "memo", "preparation", 10, 5),
+  projectQ("thesis_chapter_idea", "章立てのアイデアを書く", "graduation_thesis", "memo", "normal", 15, 10),
+  projectQ("novel_ideas_3", "小説のネタを3つ書く", "novel", "memo", "preparation", 15, 10),
+  projectQ("novel_lines_5", "キャラクターの台詞を5つメモする", "novel", "memo", "normal", 20, 15),
+  projectQ("novel_scene_memo", "シーンの断片を1つ書く", "novel", "project", "normal", 20, 15),
+  projectQ("novel_world_setting", "世界観設定を1つ書く", "novel", "memo", "normal", 15, 10),
+  projectQ("novel_opening_idea", "第一章の導入案を書く", "novel", "project", "normal", 20, 15),
+  projectQ("novel_title_candidates", "タイトル候補を書く", "novel", "memo", "preparation", 10, 5)
 ];
 
 const deprecatedNowQuestIds = ["now-light-memo", "now-creative-note", "now-illust-plan"];
@@ -176,16 +218,16 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateNowTimeLabel, 30000);
 });
 
-function q(id, title, exp, category) {
-  return { id, title, exp, category };
+function q(id, title, exp, category, type, estimatedMinutes, options = {}) {
+  return { id, title, exp, category, type, estimatedMinutes, ...options };
 }
 
-function nowQ(id, title, skillId, estimatedMinutes, expectedExp, category) {
-  return { id, title, skillId, estimatedMinutes, expectedExp, category, isSupplemental: true };
+function nowQ(id, title, skillId, estimatedMinutes, expectedExp, category, type) {
+  return { id, title, skillId, estimatedMinutes, expectedExp, category, type, isSupplemental: true };
 }
 
-function projectQ(id, title, projectId, category, exp, estimatedMinutes, options = {}) {
-  return { id, title, projectId, category, exp, estimatedMinutes, ...options };
+function projectQ(id, title, projectId, category, type, exp, estimatedMinutes, options = {}) {
+  return { id, title, projectId, category, type, exp, estimatedMinutes, ...options };
 }
 
 function createInitialState() {
@@ -421,30 +463,31 @@ function buildQuestSuggestions(daily) {
   const light = daily.sleepHours > 0 && daily.sleepHours < 5;
   const tired = daily.sleepHours > 0 && daily.sleepHours < 6;
   const minutes = normalizeMorningAvailableMinutes(daily.availableMinutes);
+  const staleNotEnglish = stale.find((skillId) => skillId !== "english");
   let picks;
 
   if (light) {
     picks = [
-      pickQuest("english", "小さい行動"),
-      pickQuest(stale[0] || "illustration", "小さい行動"),
-      pickQuest("english", "振り返り・改善")
+      pickQuestByType("english", "preparation"),
+      pickQuestByType(stale[0] || "illustration", "corePractice"),
+      pickQuestByType("english", "reflection")
     ];
   } else if (minutes <= 30) {
-    picks = [pickQuest("english", "小さい行動"), pickQuest(stale[0] || "illustration", "小さい行動")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType(staleNotEnglish || "illustration", "corePractice")];
   } else if (minutes <= 60) {
-    picks = [pickQuest("english", "通常練習"), pickQuest(stale[0] || "guitar", "通常練習"), pickQuest("english", "振り返り・改善")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType(stale[0] || "guitar", "corePractice"), pickQuestByType("illustration", "normal"), pickQuestByType("english", "reflection")];
   } else if (minutes <= 90) {
-    picks = [pickQuest("english", "通常練習"), pickQuest(stale[0] || "illustration", "通常練習"), pickQuest("english", "振り返り・改善")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType("english", "normal"), pickQuestByType(stale[0] || "illustration", "corePractice"), pickQuestByType("english", "reflection")];
   } else if (minutes <= 120) {
-    picks = [pickQuest("english", "通常練習"), pickQuest("guitar", "通常練習"), pickQuest(stale[0] || "illustration", "通常練習")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType("english", "normal"), pickQuestByType("guitar", "corePractice"), pickQuestByType(stale[0] || "illustration", "normal"), pickQuestByType("english", "reflection")];
   } else if (minutes <= 180) {
-    picks = [pickQuest("english", "通常練習"), pickQuest("guitar", "通常練習"), pickQuest("illustration", "通常練習"), pickQuest("threeD", "通常練習")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType("english", "normal"), pickQuestByType("english", "reflection"), pickQuestByType("guitar", "corePractice"), pickQuestByType("illustration", "corePractice"), pickQuestByType("threeD", "corePractice")];
   } else if (minutes <= 240) {
-    picks = [pickQuest("english", "通常練習"), pickQuest("illustration", "通常練習"), pickQuest("threeD", "通常練習"), pickQuest("guitar", "通常練習"), pickQuest("english", "振り返り・改善")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType("english", "normal"), pickQuestByType("english", "reflection"), pickQuestByType("illustration", "corePractice"), pickQuestByType("illustration", "normal"), pickQuestByType("guitar", "corePractice"), pickQuestByType("threeD", "corePractice")];
   } else if (minutes <= 360) {
-    picks = [pickQuest("english", "通常練習"), findQuest("il-oc"), findQuest("3d-object"), pickQuest("guitar", "通常練習"), pickQuest("illustration", "振り返り・改善"), pickQuest("english", "振り返り・改善")];
+    picks = [pickQuestByType("english", "corePractice"), pickQuestByType("english", "normal"), pickQuestByType("english", "reflection"), pickQuestByType("illustration", "corePractice"), pickQuestByType("illustration", "normal"), pickQuestByType("illustration", "reflection"), pickQuestByType("threeD", "normal"), pickQuestByType("guitar", "corePractice")];
   } else {
-    picks = [pickQuest("english", "通常練習"), findQuest("il-oc"), findQuest("3d-object"), findQuest("gt-phrase"), pickQuest("illustration", "振り返り・改善"), pickQuest("threeD", "振り返り・改善"), pickQuest("english", "振り返り・改善")];
+    picks = [pickQuestByType("english", "preparation"), pickQuestByType("english", "corePractice"), pickQuestByType("english", "normal"), pickQuestByType("english", "reflection"), pickQuestByType("illustration", "corePractice"), pickQuestByType("illustration", "normal"), pickQuestByType("illustration", "reflection"), pickQuestByType("threeD", "corePractice"), pickQuestByType("threeD", "normal"), pickQuestByType("threeD", "reflection"), pickQuestByType("guitar", "corePractice")];
   }
 
   if (tired) {
@@ -469,6 +512,8 @@ function toDailyQuest(item) {
     title: item.quest.title,
     exp: item.quest.exp,
     category: item.quest.category,
+    type: item.quest.type,
+    estimatedMinutes: item.quest.estimatedMinutes,
     completed: isQuestCompletedToday(item.quest.id)
   };
 }
@@ -484,12 +529,12 @@ function dedupeQuestPicks(picks) {
 
 function lightenQuestPick(item, stale) {
   if (!item) return item;
-  if (item.quest.category === "振り返り・改善") return item;
-  if (item.skillId === "english") return pickQuest("english", "小さい行動");
-  if (item.skillId === "guitar") return pickQuest("guitar", "小さい行動");
-  if (item.skillId === "illustration") return pickQuest("illustration", "小さい行動");
-  if (item.skillId === "threeD") return pickQuest("threeD", "小さい行動");
-  return pickQuest(stale[0] || "english", "小さい行動");
+  if (item.quest.type === "reflection") return item;
+  if (item.skillId === "english") return pickQuestByType("english", "preparation");
+  if (item.skillId === "guitar") return pickQuestByType("guitar", "preparation");
+  if (item.skillId === "illustration") return pickQuestByType("illustration", "preparation");
+  if (item.skillId === "threeD") return pickQuestByType("threeD", "preparation");
+  return pickQuestByType(stale[0] || "english", "preparation");
 }
 
 function getMorningQuestLimit(minutes, light) {
@@ -608,17 +653,17 @@ function isQuestAllowedInSituation(quest, situation, hasOfflineMaterials, curren
   if (!hasOfflineMaterials && ["資料確認"].includes(quest.category)) return false;
   if (quest.category === "夜の整理" && timeBlock !== "night" && effectiveSituation !== "night") return false;
 
-  if (effectiveSituation !== "home" && quest.needsVoice) return false;
-  if (effectiveSituation !== "home" && quest.needsSound) return false;
+  if (effectiveSituation !== "home" && (quest.needsVoice || quest.requiresVoice)) return false;
+  if (effectiveSituation !== "home" && (quest.needsSound || quest.requiresSound)) return false;
   if (effectiveSituation !== "home" && quest.skillId === "guitar") return false;
-  if (["commuting", "cafe", "night", "other"].includes(effectiveSituation) && quest.isHeavy) return false;
+  if (["commuting", "cafe", "night", "other"].includes(effectiveSituation) && (quest.isHeavy || quest.isHeavyTask)) return false;
   if (["commuting", "university", "cafe", "other"].includes(effectiveSituation) && quest.skillId === "threeD") return false;
-  if (effectiveSituation === "university" && quest.needsVoice) return false;
+  if (effectiveSituation === "university" && (quest.needsVoice || quest.requiresVoice)) return false;
   if (effectiveSituation === "cafe" && (quest.skillId === "threeD" || quest.isVisibleHeavy)) return false;
 
   if (timeBlock === "night" || effectiveSituation === "night") {
-    if (quest.needsVoice || quest.needsSound || quest.skillId === "guitar" || quest.skillId === "threeD" || quest.isHeavy) return false;
-    if (isAfter21 && !["メモ", "夜の整理", "振り返り"].includes(quest.category)) return false;
+    if (quest.needsVoice || quest.requiresVoice || quest.needsSound || quest.requiresSound || quest.skillId === "guitar" || quest.skillId === "threeD" || quest.isHeavy || quest.isHeavyTask) return false;
+    if (isAfter21 && !["memo", "review", "preparation", "メモ", "夜の整理", "振り返り"].includes(quest.category)) return false;
   }
 
   if (effectiveSituation === "commuting") {
@@ -655,6 +700,7 @@ function suggestNowQuests(nowModeState, allQuests, completedQuestIds, skillStats
 
   let candidates = allQuests
     .filter((quest) => !completedQuestIds.includes(quest.questId))
+    .filter((quest) => !quest.projectId)
     .filter((quest) => quest.estimatedMinutes <= nowModeState.availableMinutes)
     .filter((quest) => isQuestAllowedInSituation(quest, nowModeState.situation, nowModeState.hasOfflineMaterials, currentTime))
     .map((quest) => {
@@ -664,6 +710,10 @@ function suggestNowQuests(nowModeState, allQuests, completedQuestIds, skillStats
       if (lowExp.has(quest.skillId)) priority += 20;
       priority += getTimeBlockPriority(quest, timeBlock);
       if (quest.requiresMaterials && nowModeState.hasOfflineMaterials && nowModeState.situation !== "home") priority += 25;
+      if (quest.type === "corePractice") priority += nowModeState.availableMinutes <= 30 ? 35 : 12;
+      if (quest.type === "preparation") priority += nowModeState.availableMinutes <= 10 ? 30 : 6;
+      if (quest.type === "normal" && nowModeState.availableMinutes >= 30) priority += 14;
+      if (quest.type === "reflection" && nowModeState.availableMinutes >= 30) priority += 10;
       priority += Math.max(0, 20 - quest.estimatedMinutes);
       if (quest.isSupplemental) priority += 8;
       return {
@@ -674,10 +724,12 @@ function suggestNowQuests(nowModeState, allQuests, completedQuestIds, skillStats
     });
 
   candidates = dedupeBySkill(candidates.sort((a, b) => b.priority - a.priority));
-  const suggestedQuests = candidates.slice(0, limit).map((quest) => ({
+  const suggestedQuests = spreadNowCandidatesByType(candidates, limit, nowModeState.availableMinutes).map((quest) => ({
     skillId: quest.skillId,
     questId: quest.questId,
     title: quest.title,
+    category: quest.category,
+    type: quest.type,
     estimatedMinutes: quest.estimatedMinutes,
     expectedExp: quest.expectedExp,
     reason: quest.reason
@@ -687,6 +739,26 @@ function suggestNowQuests(nowModeState, allQuests, completedQuestIds, skillStats
     suggestedQuests,
     managerComment: buildNowManagerComment(nowModeState, timeBlock, suggestedQuests)
   };
+}
+
+function spreadNowCandidatesByType(candidates, limit, availableMinutes) {
+  const preferredTypes = availableMinutes <= 10
+    ? ["preparation", "corePractice"]
+    : availableMinutes <= 30
+      ? ["corePractice", "preparation", "normal"]
+      : ["corePractice", "normal", "reflection"];
+  const picked = [];
+  for (const type of preferredTypes) {
+    const candidate = candidates.find((item) => item.type === type && !picked.some((pickedItem) => pickedItem.questId === item.questId));
+    if (candidate) picked.push(candidate);
+    if (picked.length >= limit) return picked;
+  }
+  for (const candidate of candidates) {
+    if (picked.some((item) => item.questId === candidate.questId)) continue;
+    picked.push(candidate);
+    if (picked.length >= limit) break;
+  }
+  return picked;
 }
 
 function spreadOutsideCandidates(candidates, limit) {
@@ -729,6 +801,7 @@ function suggestOutsideQuests(nowModeState, allQuests, completedQuestIds, limit,
     questId: quest.questId,
     title: quest.title,
     category: quest.category,
+    type: quest.type,
     estimatedMinutes: quest.estimatedMinutes,
     expectedExp: quest.expectedExp,
     reason: quest.reason
@@ -746,14 +819,19 @@ function getAllNowQuestOptions() {
       skillId,
       questId: quest.id,
       title: quest.title,
-      category: "skill",
+      category: quest.category,
+      type: quest.type,
       originalCategory: quest.category,
-      estimatedMinutes: estimateQuestMinutes(skillId, quest),
+      estimatedMinutes: quest.estimatedMinutes || estimateQuestMinutes(skillId, quest),
       expectedExp: quest.exp,
-      needsVoice: isVoiceQuest(quest.id),
-      needsSound: skillId === "guitar" || quest.id === "en-record",
-      isHeavy: isHeavyQuest(skillId, quest),
-      isVisibleHeavy: ["il-oc", "il-copy", "il-memory", "il-face", "il-pose"].includes(quest.id),
+      needsVoice: Boolean(quest.requiresVoice),
+      requiresVoice: Boolean(quest.requiresVoice),
+      needsSound: Boolean(quest.requiresSound),
+      requiresSound: Boolean(quest.requiresSound),
+      requiresHome: Boolean(quest.requiresHome),
+      isHeavy: Boolean(quest.isHeavyTask) || isHeavyQuest(skillId, quest),
+      isHeavyTask: Boolean(quest.isHeavyTask),
+      isVisibleHeavy: quest.type === "normal" && ["illustration", "threeD"].includes(skillId),
       isPhoneFriendly: isPhoneFriendlyQuest(quest.id)
     }))
   );
@@ -765,11 +843,15 @@ function getAllNowQuestOptions() {
       questId: quest.id,
       title: quest.title,
       category: quest.category,
+      type: quest.type,
       estimatedMinutes: quest.estimatedMinutes,
       expectedExp: quest.expectedExp,
       needsVoice: false,
+      requiresVoice: false,
       needsSound: false,
+      requiresSound: false,
       isHeavy: false,
+      isHeavyTask: false,
       isVisibleHeavy: false,
       isPhoneFriendly: true,
       isSupplemental: true
@@ -779,6 +861,7 @@ function getAllNowQuestOptions() {
       questId: quest.id,
       title: quest.title,
       category: quest.category,
+      type: quest.type,
       estimatedMinutes: quest.estimatedMinutes,
       expectedExp: quest.exp,
       requiresMaterials: Boolean(quest.requiresOfflineMaterials),
@@ -787,6 +870,7 @@ function getAllNowQuestOptions() {
       needsSound: false,
       requiresHome: false,
       isHeavy: false,
+      isHeavyTask: false,
       isVisibleHeavy: false,
       isPhoneFriendly: true,
       isSupplemental: true
@@ -860,25 +944,26 @@ function estimateQuestMinutes(skillId, quest) {
 }
 
 function isVoiceQuest(questId) {
-  return ["en-1min", "en-3min", "en-record", "en-retry", "en-70", "en-up"].includes(questId);
+  return ["english_read_aloud_3", "english_shadowing_3", "english_speak_1", "english_read_corrected_text", "english_speech_3", "english_respeak_corrected"].includes(questId);
 }
 
 function isPhoneFriendlyQuest(questId) {
-  return ["en-input", "en-prompt", "en-result", "en-improve", "en-revised"].includes(questId);
+  return ["english_open_log", "english_choose_topic", "english_log_spoken_text", "english_generate_prompt", "english_save_correction", "english_write_improvement", "english_topic_1", "english_draft_3_sentences", "english_review_correction"].includes(questId);
 }
 
 function isHeavyQuest(skillId, quest) {
-  if (skillId === "threeD") return !["3d-improve"].includes(quest.id);
-  if (skillId === "guitar") return quest.exp >= 20;
-  return quest.exp >= 35 || ["il-oc", "il-memory", "gt-record", "en-retry"].includes(quest.id);
+  if (quest.type === "preparation" || quest.type === "corePractice") return false;
+  if (skillId === "threeD") return quest.type === "normal";
+  if (skillId === "guitar") return quest.exp >= 30;
+  return quest.exp >= 35 || quest.id === "english_respeak_corrected";
 }
 
 function getTimeBlockPriority(quest, timeBlock) {
   if (timeBlock === "morning" && quest.skillId === "english") return 20;
-  if (timeBlock === "morning" && quest.isHeavy) return 10;
+  if (timeBlock === "morning" && (quest.isHeavy || quest.isHeavyTask || quest.type === "normal")) return 10;
   if (timeBlock === "afternoon" && ["illustration", "threeD"].includes(quest.skillId)) return 18;
   if (timeBlock === "evening" && ["guitar", "illustration"].includes(quest.skillId)) return 14;
-  if (timeBlock === "night" && ["メモ", "振り返り", "夜の整理"].includes(quest.category)) return 30;
+  if (timeBlock === "night" && ["memo", "review", "preparation", "メモ", "振り返り", "夜の整理"].includes(quest.category)) return 30;
   return 0;
 }
 
@@ -949,9 +1034,15 @@ function pickQuest(skillId, category) {
   return { skillId, quest };
 }
 
+function pickQuestByType(skillId, type) {
+  const quest = quests[skillId].find((item) => item.type === type) || quests[skillId][0];
+  return { skillId, quest };
+}
+
 function findQuest(questId) {
+  const normalizedQuestId = legacyQuestAliases[questId] || questId;
   for (const [skillId, list] of Object.entries(quests)) {
-    const quest = list.find((item) => item.id === questId);
+    const quest = list.find((item) => item.id === normalizedQuestId);
     if (quest) return { skillId, quest };
   }
   return null;
@@ -992,6 +1083,8 @@ function handleManualQuestClick(event) {
       title: found.quest.title,
       exp: found.quest.exp,
       category: found.quest.category,
+      type: found.quest.type,
+      estimatedMinutes: found.quest.estimatedMinutes,
       completed: false
     },
     "questList"
@@ -1014,6 +1107,7 @@ function handleNowCompleteClick(event) {
       title: quest.title,
       exp: quest.expectedExp,
       category: quest.category || "nowMode",
+      type: quest.type || "normal",
       completed: false
     },
     "nowMode",
@@ -1053,6 +1147,9 @@ function completeQuest(quest, source, options = {}) {
       title: quest.title,
       expGained: quest.exp,
       source: sourceKey,
+      category: quest.category,
+      type: quest.type || "normal",
+      estimatedMinutes: options.estimatedMinutes || quest.estimatedMinutes,
       completedAt: new Date().toISOString()
     });
   }
@@ -1068,9 +1165,10 @@ function completeQuest(quest, source, options = {}) {
     expGained: quest.exp,
     exp: quest.exp,
     category: quest.category,
+    type: quest.type || "normal",
     source: sourceKey,
     completedAt: new Date().toISOString(),
-    estimatedMinutes: options.estimatedMinutes,
+    estimatedMinutes: options.estimatedMinutes || quest.estimatedMinutes,
     situation: options.situation,
     createdAt: new Date().toISOString()
   };
@@ -1096,7 +1194,7 @@ function generateCorrectionPrompt() {
   const spokenText = dom.spokenTextInput.value.trim();
   const prompt = `以下の英語スピーキング内容を添削してください。\n\n目的：\n私は仕事で使える英語力と、自分の価値観やアイデンティティについて深く話せる英語力を伸ばしたいです。\n\n添削してほしいこと：\n\n1. 文法や不自然な表現を直してください。\n2. より自然な英語表現にしてください。\n3. 私の英語レベルに合う表現も提案してください。\n4. Fluency / Accuracy / Vocabulary / Coherence / Depth の5項目で評価してください。\n5. 100点満点で採点してください。\n6. 次に言い直すための改善ポイントを3つ教えてください。\n\n私が話した内容：\n「${spokenText}」`;
   dom.correctionPromptInput.value = prompt;
-  completeQuestFromId("en-prompt", "englishLog");
+  completeQuestFromId("english_generate_prompt", "englishLog");
 }
 
 function saveEnglishLog() {
@@ -1122,11 +1220,10 @@ function saveEnglishLog() {
     createdAt: new Date().toISOString()
   };
 
-  if (log.spokenText) log.earnedExp += completeQuestFromId("en-input", "englishLog", false);
-  if (log.correctionResult) log.earnedExp += completeQuestFromId("en-result", "englishLog", false);
-  if (log.revisedText) log.earnedExp += completeQuestFromId("en-revised", "englishLog", false);
-  if (log.improvement) log.earnedExp += completeQuestFromId("en-improve", "englishLog", false);
-  if (Number(log.scores.total) >= 70) log.earnedExp += completeQuestFromId("en-70", "englishLog", false);
+  if (log.spokenText) log.earnedExp += completeQuestFromId("english_log_spoken_text", "englishLog", false);
+  if (log.correctionResult || log.revisedText) log.earnedExp += completeQuestFromId("english_save_correction", "englishLog", false);
+  if (log.improvement) log.earnedExp += completeQuestFromId("english_write_improvement", "englishLog", false);
+  if (Number(log.scores.total) >= 70) log.earnedExp += completeQuestFromId("english_score_70", "englishLog", false);
   state.englishLogs.unshift(log);
   state.managerComment = "英語ログ保存。言いっぱなしで終わらせなかったのは大きいぞ。";
   saveState();
@@ -1144,6 +1241,8 @@ function completeQuestFromId(questId, source, render = true) {
       title: found.quest.title,
       exp: found.quest.exp,
       category: found.quest.category,
+      type: found.quest.type,
+      estimatedMinutes: found.quest.estimatedMinutes,
       completed: false
     },
     source
@@ -1168,10 +1267,10 @@ function saveImageLog() {
   const ratings = Object.fromEntries(
     ratingLabels[skillId].map((label) => [label, Number(document.querySelector(`[data-rating="${label}"]`)?.value || 0)])
   );
-  const questId = skillId === "illustration" ? "il-image" : "3d-image";
+  const questId = skillId === "illustration" ? "illust_save_image_log" : "modeling_save_screenshot";
   const earnedExp = completeQuestFromId(questId, "imageLog", false);
   if (dom.imageImprovementInput.value.trim()) {
-    completeQuestFromId(skillId === "illustration" ? "il-improve" : "3d-improve", "imageLog", false);
+    completeQuestFromId(skillId === "illustration" ? "illust_write_improvement" : "modeling_write_improvement", "imageLog", false);
   }
   state.imageLogs.unshift({
     id: createId(`${Date.now()}-image-log`),
@@ -1295,7 +1394,7 @@ function renderNowSuggestionCard(quest) {
   return `
     <article class="now-suggestion-card ${completed ? "is-done" : ""}" style="--skill: ${owner.color}">
       <div>
-        <span class="quest-tag">${escapeHtml(owner.name)}</span>
+        <span class="quest-tag">${escapeHtml(typeLabel(quest.type))} / ${escapeHtml(owner.name)}</span>
         <h3>${escapeHtml(quest.title)}</h3>
         <p>${escapeHtml(quest.reason)}</p>
       </div>
@@ -1348,15 +1447,15 @@ function renderBreakBlock(block) {
 }
 
 function renderQuestCard(quest, block = null) {
-  const skill = state.skills[quest.skillId];
+  const skill = state.skills[quest.skillId] || skillSeeds[quest.skillId] || skillSeeds.english;
   return `
     <article class="quest-card ${quest.completed ? "is-done" : ""}" style="--skill: ${skill.color}">
       <div>
-        <span class="quest-tag">${block ? `${escapeHtml(block.label)} / ${block.minutes}分 / ` : ""}${escapeHtml(skill.name)} / ${escapeHtml(quest.category)}</span>
+        <span class="quest-tag">${block ? `${escapeHtml(block.label)} / ${block.minutes}分 / ` : ""}${escapeHtml(typeLabel(quest.type))} / ${escapeHtml(skill.name)}</span>
         <h3>${escapeHtml(quest.title)}</h3>
       </div>
       <div class="quest-side">
-        <strong>+${quest.exp} EXP</strong>
+        <strong>${quest.estimatedMinutes ? `${quest.estimatedMinutes}分 / ` : ""}+${quest.exp} EXP</strong>
         <button class="complete-btn" data-complete-today="${quest.id}" ${quest.completed ? "disabled" : ""}>${quest.completed ? "完了済み" : "達成"}</button>
       </div>
     </article>
@@ -1408,9 +1507,9 @@ function renderManualQuests() {
           const completed = isQuestCompletedToday(quest.id);
           return `
           <article class="manual-quest ${completed ? "is-done" : ""}">
-            <span>${escapeHtml(quest.category)}</span>
+            <span>${escapeHtml(typeLabel(quest.type))} / ${escapeHtml(categoryLabel(quest.category))}</span>
             <b>${escapeHtml(quest.title)}</b>
-            <em>+${quest.exp} EXP</em>
+            <em>${quest.estimatedMinutes || estimateQuestMinutes(skillId, quest)}分 / +${quest.exp} EXP</em>
             <button class="secondary-btn compact" data-manual-quest="${quest.id}" ${completed ? "disabled" : ""}>${completed ? "完了済み" : "登録"}</button>
           </article>
         `;
@@ -1470,7 +1569,7 @@ function renderHistory() {
     ? state.questHistory.slice().reverse().slice(0, 40).map((item) => `
       <article class="history-item">
         <strong>${escapeHtml(item.date)} ${escapeHtml(getLogOwnerName(item))} +${item.expGained ?? item.exp} EXP</strong>
-        <span>${escapeHtml(item.title)} / ${escapeHtml(categoryLabel(item.category))} / ${escapeHtml(sourceLabel(item.source))}${item.estimatedMinutes ? ` / ${item.estimatedMinutes}分` : ""}${item.situation ? ` / ${escapeHtml(situationLabel(item.situation))}` : ""}</span>
+        <span>${escapeHtml(item.title)} / ${escapeHtml(typeLabel(item.type))} / ${escapeHtml(categoryLabel(item.category))} / ${escapeHtml(sourceLabel(item.source))}${item.estimatedMinutes ? ` / ${item.estimatedMinutes}分` : ""}${item.situation ? ` / ${escapeHtml(situationLabel(item.situation))}` : ""}</span>
       </article>
     `).join("")
     : `<div class="empty">履歴はまだありません。</div>`;
@@ -1480,7 +1579,7 @@ function renderSettings() {
   dom.levelTable.innerHTML = levelTable.map((row) => `<p>Lv.${row.level}: 累計 ${row.exp} EXP</p>`).join("");
   dom.expTable.innerHTML = Object.entries(quests).map(([skillId, list]) => `
     <h4>${escapeHtml(state.skills[skillId].name)}</h4>
-    ${list.map((item) => `<p>${escapeHtml(item.title)}: ${item.exp} EXP</p>`).join("")}
+    ${list.map((item) => `<p>${escapeHtml(typeLabel(item.type))} / ${escapeHtml(item.title)}: ${item.exp} EXP</p>`).join("")}
   `).join("");
 }
 
@@ -1557,6 +1656,18 @@ function categoryLabel(category) {
     "通常練習": "通常練習",
     "振り返り・改善": "振り返り・改善"
   }[category] || category || "クエスト";
+}
+
+function typeLabel(type) {
+  return {
+    preparation: "準備",
+    corePractice: "基礎練",
+    normal: "通常",
+    reflection: "振り返り",
+    "小さい行動": "準備",
+    "通常練習": "通常",
+    "振り返り・改善": "振り返り"
+  }[type] || "通常";
 }
 
 function situationLabel(situation) {

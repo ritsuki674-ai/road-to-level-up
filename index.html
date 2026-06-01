@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101827" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Road Level Up" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Road to Level Up</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+    <link rel="stylesheet" href="./styles.css?v=road-level-up-pwa1" />
+    <script src="./app.js?v=road-level-up-pwa1" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Skill RPG Tracker</p>
+          <h1>Road to Level Up</h1>
+        </div>
+        <div class="today-pill" id="todayLabel"></div>
+      </header>
+
+      <nav class="nav" aria-label="画面切り替え">
+        <button class="nav-btn is-active" data-view="home">ホーム</button>
+        <button class="nav-btn" data-view="skills">スキル</button>
+        <button class="nav-btn" data-view="quests">クエスト</button>
+        <button class="nav-btn" data-view="english">英語ログ</button>
+        <button class="nav-btn" data-view="images">画像ログ</button>
+        <button class="nav-btn" data-view="history">履歴</button>
+        <button class="nav-btn" data-view="settings">設定</button>
+      </nav>
+
+      <main>
+        <section class="view is-active" id="view-home">
+          <section class="hero-grid">
+            <article class="manager-card">
+              <div class="avatar-frame" id="managerAvatar"></div>
+              <div>
+                <p class="eyebrow">Manager</p>
+                <h2>今日の配球</h2>
+                <p id="managerComment">今日は時間を見てクエストを切るぞ。欲張りすぎるな。</p>
+              </div>
+            </article>
+
+            <article class="scoreboard">
+              <span>Today EXP</span>
+              <strong id="todayExp">0</strong>
+              <div class="score-row">
+                <span>達成率</span>
+                <b id="todayRate">0%</b>
+              </div>
+            </article>
+          </section>
+
+          <section class="panel now-panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Now Mode</p>
+                <h2>今なにする？</h2>
+              </div>
+              <div class="now-time" id="nowTimeLabel">--:--</div>
+            </div>
+            <div class="now-layout">
+              <div class="now-controls">
+                <label class="field">
+                  <span>今使える時間</span>
+                  <select id="nowAvailableInput">
+                    <option value="5">5分</option>
+                    <option value="10">10分</option>
+                    <option value="30" selected>30分</option>
+                    <option value="60">60分</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>現在の状況</span>
+                  <select id="nowSituationInput">
+                    <option value="home">家</option>
+                    <option value="commuting">通学中</option>
+                    <option value="university">大学</option>
+                    <option value="cafe">カフェ</option>
+                    <option value="night">夜</option>
+                    <option value="other">その他</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>PDFや資料</span>
+                  <select id="nowMaterialsInput">
+                    <option value="yes">あり</option>
+                    <option value="no" selected>なし</option>
+                  </select>
+                </label>
+                <button class="primary-btn" id="nowSuggestBtn">今なにする？</button>
+              </div>
+              <aside class="now-comment" id="nowComment">今の場所と時間で、できる球だけ選べ。無理な配球はしない。</aside>
+            </div>
+            <div class="now-suggestion-list" id="nowSuggestionList"></div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Morning Check-in</p>
+                <h2>朝の入力</h2>
+              </div>
+              <button class="primary-btn" id="suggestQuestBtn">今日のクエスト提案</button>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>睡眠時間</span>
+                <input id="sleepInput" type="number" min="0" max="14" step="0.5" value="6.5" />
+              </label>
+              <label class="field">
+                <span>起床時間</span>
+                <input id="wakeInput" type="time" value="06:30" />
+              </label>
+              <label class="field">
+                <span>今日使える時間</span>
+                <select id="availableInput">
+                  <option value="30" selected>30分</option>
+                  <option value="60">60分</option>
+                  <option value="90">1時間30分</option>
+                  <option value="120">2時間</option>
+                  <option value="150">2時間30分</option>
+                  <option value="180">3時間</option>
+                  <option value="210">3時間30分</option>
+                  <option value="240">4時間</option>
+                  <option value="270">4時間30分</option>
+                  <option value="300">5時間</option>
+                  <option value="330">5時間30分</option>
+                  <option value="360">6時間</option>
+                  <option value="390">6時間30分</option>
+                  <option value="420">7時間</option>
+                  <option value="450">7時間30分</option>
+                  <option value="480">8時間</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Daily Quests</p>
+                <h2>今日のクエスト</h2>
+              </div>
+              <span class="limit-note">時間に応じて調整</span>
+            </div>
+            <div class="quest-list" id="todayQuestList"></div>
+          </section>
+
+          <section class="skill-mini-grid" id="skillMiniGrid"></section>
+        </section>
+
+        <section class="view" id="view-skills">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Status</p>
+                <h2>スキル一覧</h2>
+              </div>
+            </div>
+            <div class="skill-grid" id="skillList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-quests">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Quest Board</p>
+                <h2>手動クエスト</h2>
+              </div>
+            </div>
+            <div class="manual-quest-board" id="manualQuestBoard"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-english">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">English Log</p>
+                <h2>英語スピーキングログ</h2>
+              </div>
+              <button class="secondary-btn" id="generatePromptBtn">添削プロンプトを生成</button>
+            </div>
+            <div class="log-form">
+              <label class="field">
+                <span>今日のテーマ</span>
+                <input id="englishThemeInput" type="text" placeholder="例: My identity and values" />
+              </label>
+              <label class="field">
+                <span>話した英文</span>
+                <textarea id="spokenTextInput" rows="6" placeholder="ここに話した内容を書き起こす"></textarea>
+              </label>
+              <label class="field">
+                <span>添削前メモ</span>
+                <textarea id="preCorrectionMemoInput" rows="3" placeholder="詰まった点、言えなかった表現など"></textarea>
+              </label>
+              <label class="field">
+                <span>生成された添削用プロンプト</span>
+                <textarea id="correctionPromptInput" rows="8" readonly></textarea>
+              </label>
+              <label class="field">
+                <span>添削結果</span>
+                <textarea id="correctionResultInput" rows="5"></textarea>
+              </label>
+              <label class="field">
+                <span>修正文</span>
+                <textarea id="revisedTextInput" rows="5"></textarea>
+              </label>
+              <div class="score-input-grid">
+                <label class="field"><span>Fluency</span><input id="fluencyInput" type="number" min="0" max="100" /></label>
+                <label class="field"><span>Accuracy</span><input id="accuracyInput" type="number" min="0" max="100" /></label>
+                <label class="field"><span>Vocabulary</span><input id="vocabularyInput" type="number" min="0" max="100" /></label>
+                <label class="field"><span>Coherence</span><input id="coherenceInput" type="number" min="0" max="100" /></label>
+                <label class="field"><span>Depth</span><input id="depthInput" type="number" min="0" max="100" /></label>
+                <label class="field"><span>Total Score</span><input id="totalScoreInput" type="number" min="0" max="100" /></label>
+              </div>
+              <label class="field">
+                <span>改善点</span>
+                <textarea id="englishImprovementInput" rows="3"></textarea>
+              </label>
+              <button class="primary-btn" id="saveEnglishLogBtn">英語ログを保存</button>
+            </div>
+            <div class="history-list" id="englishLogList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-images">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Image Log</p>
+                <h2>イラスト・3D画像ログ</h2>
+              </div>
+            </div>
+            <div class="image-log-layout">
+              <div class="log-form">
+                <label class="field">
+                  <span>画像アップロード</span>
+                  <input id="imageFileInput" type="file" accept="image/*" />
+                </label>
+                <label class="field">
+                  <span>スキル種別</span>
+                  <select id="imageSkillInput">
+                    <option value="illustration">イラスト</option>
+                    <option value="threeD">3Dオブジェクト制作</option>
+                  </select>
+                </label>
+                <label class="field"><span>タイトル</span><input id="imageTitleInput" type="text" /></label>
+                <label class="field"><span>制作内容メモ</span><textarea id="imageMemoInput" rows="3"></textarea></label>
+                <div class="rating-grid" id="ratingGrid"></div>
+                <label class="field"><span>改善点</span><textarea id="imageImprovementInput" rows="3"></textarea></label>
+                <button class="primary-btn" id="saveImageLogBtn">画像ログを保存</button>
+              </div>
+              <div class="image-preview" id="imagePreview">画像プレビュー</div>
+            </div>
+            <div class="image-log-list" id="imageLogList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-history">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">History</p>
+                <h2>履歴</h2>
+              </div>
+            </div>
+            <div class="history-summary" id="historySummary"></div>
+            <div class="history-list" id="questHistoryList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-settings">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Settings</p>
+                <h2>設定・データ管理</h2>
+              </div>
+            </div>
+            <div class="settings-grid">
+              <article class="settings-card">
+                <h3>バックアップ</h3>
+                <button class="secondary-btn" id="exportBtn">JSONエクスポート</button>
+                <label class="import-label">
+                  JSONインポート
+                  <input id="importInput" type="file" accept="application/json" />
+                </label>
+              </article>
+              <article class="settings-card">
+                <h3>マネージャー画像</h3>
+                <label class="import-label">
+                  画像を差し替え
+                  <input id="managerImageInput" type="file" accept="image/*" />
+                </label>
+              </article>
+              <article class="settings-card">
+                <h3>データリセット</h3>
+                <button class="danger-btn" id="resetBtn">初期状態に戻す</button>
+              </article>
+            </div>
+            <div class="tables-grid">
+              <article class="settings-card">
+                <h3>レベル表</h3>
+                <div id="levelTable"></div>
+              </article>
+              <article class="settings-card">
+                <h3>EXP表</h3>
+                <div id="expTable"></div>
+              </article>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+    <div class="update-toast" id="updateToast" hidden>
+      <span>新しい版があります。更新して反映できます。</span>
+      <button class="secondary-btn compact" id="reloadAppBtn">更新</button>
+    </div>
+  </body>
+</html>

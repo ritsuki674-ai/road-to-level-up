@@ -1,0 +1,19 @@
+{
+  "name": "Road to Level Up",
+  "short_name": "Level Up",
+  "description": "EXP, quests, logs, and project progress for daily skill leveling.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090d18",
+  "theme_color": "#101827",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

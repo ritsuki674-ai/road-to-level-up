@@ -1,5 +1,5 @@
 const STORAGE_KEY = "road-to-level-up-mvp-v1";
-const APP_VERSION = "road-level-up-pwa4";
+const APP_VERSION = "road-level-up-pwa6";
 
 const levelTable = [
   { level: 1, exp: 0 },
@@ -55,18 +55,119 @@ const projectSeeds = {
   graduation_thesis: {
     id: "graduation_thesis",
     name: "卒論",
-    goal: "12月提出に向けて、8月末までに分析の目処をつける",
+    goal: "12月提出までに卒論を完成・提出する。中間締切や作業指示はMilestoneで管理する。",
+    priority: 1,
+    exp: 0,
     progress: 0,
+    status: "active",
+    milestones: [
+      {
+        id: "thesis_literature_20260825",
+        projectId: "graduation_thesis",
+        title: "8月25日までに文献5つを調べてまとめる",
+        deadline: "2026-08-25",
+        status: "active",
+        tasks: []
+      }
+    ],
     color: "#38bdf8"
+  },
+  community_revival: {
+    id: "community_revival",
+    name: "町おこし",
+    goal: "地域や関心のある場所について、課題・魅力・企画案を整理し、実行可能な活動案を作る。",
+    priority: 7,
+    exp: 0,
+    progress: 0,
+    status: "active",
+    milestones: [],
+    color: "#14b8a6"
+  },
+  startup: {
+    id: "startup",
+    name: "起業",
+    goal: "事業アイデアを整理し、収益化や提供価値の形を検討する。",
+    priority: 6,
+    exp: 0,
+    progress: 0,
+    status: "active",
+    milestones: [],
+    color: "#ef4444"
+  },
+  road_level_up_dev: {
+    id: "road_level_up_dev",
+    name: "Road to Level Up開発",
+    goal: "人生の成長をRPG化する個人用アプリとして、Skill / Project / Life / Inboxを扱える形に拡張する。",
+    priority: 2,
+    exp: 0,
+    progress: 0,
+    status: "active",
+    milestones: [],
+    color: "#1f6feb"
   },
   novel: {
     id: "novel",
     name: "小説",
     goal: "2027年3月前までに投稿可能レベルの長編小説を完成させる",
+    priority: 4,
+    exp: 0,
     progress: 0,
+    status: "active",
+    milestones: [],
     color: "#f59e0b"
+  },
+  ai_dev: {
+    id: "ai_dev",
+    name: "AI開発",
+    goal: "AIを使ったアプリ・ツール・創作支援の開発スキルを伸ばし、実用できる小さな成果物を作る。",
+    priority: 3,
+    exp: 0,
+    progress: 0,
+    status: "active",
+    milestones: [],
+    color: "#a855f7"
+  },
+  manga: {
+    id: "manga",
+    name: "漫画",
+    goal: "キャラクター・ネーム・短編制作を通して、投稿または公開できる漫画作品を作る。",
+    priority: 5,
+    exp: 0,
+    progress: 0,
+    status: "active",
+    milestones: [],
+    color: "#ec4899"
   }
 };
+
+const lifeAreas = {
+  health: "健康",
+  home: "家事",
+  admin: "手続き",
+  money: "お金",
+  appearance: "身だしなみ",
+  schedule: "予定・連絡",
+  other: "その他"
+};
+
+const classificationRules = [
+  rule(["卒論", "論文", "文献", "先生", "分析"], "project", { projectId: "graduation_thesis" }),
+  rule(["町おこし", "地域", "課題"], "project", { projectId: "community_revival" }),
+  rule(["起業", "収益化", "事業"], "project", { projectId: "startup" }),
+  rule(["Road to Level Up", "アプリ", "バグ"], "project", { projectId: "road_level_up_dev" }),
+  rule(["小説", "キャラクター", "世界観", "台詞"], "project", { projectId: "novel" }),
+  rule(["AI", "LLM", "プロンプト", "モデル"], "project", { projectId: "ai_dev" }),
+  rule(["漫画", "ネーム", "コマ割り"], "project", { projectId: "manga" }),
+  rule(["英語", "IELTS"], "skill", { skillId: "english" }),
+  rule(["ギター", "フレーズ"], "skill", { skillId: "guitar" }),
+  rule(["Blender", "3D"], "skill", { skillId: "threeD" }),
+  rule(["イラスト", "ラフ"], "skill", { skillId: "illustration" }),
+  rule(["歯医者", "病院", "脱毛"], "life", { lifeArea: "health" }),
+  rule(["爪", "身だしなみ"], "life", { lifeArea: "appearance" }),
+  rule(["洗濯", "掃除"], "life", { lifeArea: "home" }),
+  rule(["返信", "予定", "予約", "メール"], "life", { lifeArea: "schedule" }),
+  rule(["手続き", "支払い"], "life", { lifeArea: "admin" })
+];
 
 const quests = {
   english: [
@@ -230,6 +331,10 @@ function projectQ(id, title, projectId, category, type, exp, estimatedMinutes, o
   return { id, title, projectId, category, type, exp, estimatedMinutes, ...options };
 }
 
+function rule(keywords, domain, options = {}) {
+  return { keywords, domain, ...options };
+}
+
 function createInitialState() {
   const skills = Object.fromEntries(
     Object.values(skillSeeds).map((skill) => [
@@ -247,6 +352,8 @@ function createInitialState() {
     skills,
     projects: structuredCloneSafe(projectSeeds),
     projectLogs: [],
+    inboxItems: [],
+    lifeTasks: [],
     daily: {},
     questHistory: [],
     englishLogs: [],
@@ -272,6 +379,11 @@ function cacheDom() {
     "managerComment",
     "todayExp",
     "todayRate",
+    "todayProjectExp",
+    "todayLifeCount",
+    "homeInboxInput",
+    "homeInboxPreview",
+    "addInboxBtn",
     "sleepInput",
     "wakeInput",
     "availableInput",
@@ -286,6 +398,10 @@ function cacheDom() {
     "todayQuestList",
     "skillMiniGrid",
     "skillList",
+    "projectList",
+    "inboxInput",
+    "addInboxPageBtn",
+    "inboxList",
     "manualQuestBoard",
     "generatePromptBtn",
     "englishThemeInput",
@@ -333,6 +449,11 @@ function bindEvents() {
   });
 
   dom.suggestQuestBtn.addEventListener("click", suggestTodayQuests);
+  dom.addInboxBtn?.addEventListener("click", () => addInboxFromInput(dom.homeInboxInput));
+  dom.addInboxPageBtn?.addEventListener("click", () => addInboxFromInput(dom.inboxInput));
+  dom.inboxList?.addEventListener("click", handleInboxClick);
+  dom.inboxList?.addEventListener("change", handleInboxChange);
+  dom.projectList?.addEventListener("click", handleProjectClick);
   dom.nowSuggestBtn.addEventListener("click", handleNowSuggest);
   dom.nowSuggestionList.addEventListener("click", handleNowCompleteClick);
   dom.todayQuestList.addEventListener("click", handleQuestClick);
@@ -409,17 +530,23 @@ function updateNowTimeLabel() {
 
 function ensureToday() {
   const key = todayKey();
-  state.projects = { ...structuredCloneSafe(projectSeeds), ...(state.projects || {}) };
+  state.projects = mergeProjects(state.projects || {});
   state.projectLogs = state.projectLogs || [];
+  state.inboxItems = state.inboxItems || [];
+  state.lifeTasks = state.lifeTasks || [];
   state.daily[key] = state.daily[key] || {
     date: key,
     sleepHours: 6.5,
     wakeTime: "06:30",
     availableMinutes: 30,
     quests: [],
+    lifeTaskIds: [],
+    projectTaskIds: [],
     createdAt: new Date().toISOString()
   };
   const daily = state.daily[key];
+  daily.lifeTaskIds = daily.lifeTaskIds || [];
+  daily.projectTaskIds = daily.projectTaskIds || [];
   daily.availableMinutes = normalizeMorningAvailableMinutes(daily.availableMinutes);
   dom.sleepInput.value = daily.sleepHours;
   dom.wakeInput.value = daily.wakeTime;
@@ -456,6 +583,128 @@ function suggestTodayQuests() {
   state.managerComment = buildMorningManagerComment(daily);
   saveState();
   renderAll();
+}
+
+function addInboxFromInput(input) {
+  const lines = parseInboxLines(input?.value || "");
+  if (!lines.length) return;
+  const created = lines.map((title) => createInboxItem(title));
+  state.inboxItems.unshift(...created);
+  if (input) input.value = "";
+  state.managerComment = `${created.length}件Inboxに入れた。頭の中から出した時点で、もう半分勝ちだ。`;
+  saveState();
+  renderAll();
+}
+
+function parseInboxLines(value) {
+  return String(value)
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^\s*(?:[-・*]|\d+[.)、])\s*/, "").trim())
+    .filter(Boolean);
+}
+
+function createInboxItem(title) {
+  const classified = classifyInboxTitle(title);
+  return {
+    id: createId(`${Date.now()}-${Math.random()}-${title}`),
+    title,
+    memo: "",
+    createdAt: new Date().toISOString(),
+    status: classified.domain ? "classified" : "unclassified",
+    suggestedDomain: classified.domain || "inbox",
+    domain: classified.domain || "inbox",
+    skillId: classified.skillId,
+    projectId: classified.projectId,
+    lifeArea: classified.lifeArea,
+    estimatedMinutes: "unknown"
+  };
+}
+
+function classifyInboxTitle(title) {
+  const lower = String(title).toLowerCase();
+  const match = classificationRules.find((item) =>
+    item.keywords.some((keyword) => lower.includes(String(keyword).toLowerCase()))
+  );
+  if (!match) return {};
+  return {
+    domain: match.domain,
+    skillId: match.skillId,
+    projectId: match.projectId,
+    lifeArea: match.lifeArea
+  };
+}
+
+function handleInboxChange(event) {
+  const field = event.target.closest("[data-inbox-field]");
+  if (!field) return;
+  const item = state.inboxItems.find((entry) => entry.id === field.dataset.inboxId);
+  if (!item) return;
+  item[field.dataset.inboxField] = field.value;
+  if (field.dataset.inboxField === "domain") {
+    item.status = field.value === "inbox" ? "unclassified" : "classified";
+    if (field.value !== "skill") item.skillId = "";
+    if (field.value !== "project") item.projectId = "";
+    if (field.value !== "life") item.lifeArea = "";
+  }
+  saveState();
+  renderInbox();
+}
+
+function handleInboxClick(event) {
+  const addToday = event.target.closest("[data-inbox-today]");
+  if (addToday) {
+    convertInboxToToday(addToday.dataset.inboxToday);
+    return;
+  }
+  const remove = event.target.closest("[data-inbox-remove]");
+  if (remove) {
+    state.inboxItems = state.inboxItems.filter((item) => item.id !== remove.dataset.inboxRemove);
+    saveState();
+    renderAll();
+  }
+}
+
+function convertInboxToToday(inboxId) {
+  const item = state.inboxItems.find((entry) => entry.id === inboxId);
+  if (!item) return;
+  const domain = item.domain === "inbox" ? item.suggestedDomain : item.domain;
+  if (domain === "project" && item.projectId) {
+    const task = createProjectTask(item.projectId, "", item.title, { addedToToday: true, sourceInboxId: item.id });
+    getToday().projectTaskIds.push(task.id);
+    item.status = "converted";
+  } else if (domain === "life") {
+    const task = createLifeTask(item.title, item.lifeArea || "other", { addedToToday: true, sourceInboxId: item.id });
+    getToday().lifeTaskIds.push(task.id);
+    item.status = "converted";
+  } else if (domain === "skill" && item.skillId) {
+    const quest = createSkillInboxQuest(item);
+    getToday().quests.push(quest);
+    item.status = "converted";
+  } else {
+    item.status = "unclassified";
+    state.managerComment = "分類が決まってない。まずProjectかLifeかSkillに振り分けろ。";
+    saveState();
+    renderAll();
+    return;
+  }
+  state.managerComment = "今日やることに入れた。入れただけで満足するなよ、次は完了だ。";
+  saveState();
+  renderAll();
+}
+
+function createSkillInboxQuest(item) {
+  const exp = item.skillId === "english" ? 10 : 5;
+  return {
+    id: createId(`${todayKey()}-inbox-${item.id}`),
+    skillId: item.skillId,
+    questId: createId(`inbox-${item.id}`),
+    title: item.title,
+    exp,
+    category: "preparation",
+    type: "preparation",
+    estimatedMinutes: item.estimatedMinutes === "unknown" ? undefined : item.estimatedMinutes,
+    completed: false
+  };
 }
 
 function buildQuestSuggestions(daily) {
@@ -723,10 +972,43 @@ function suggestNowQuests(nowModeState, allQuests, completedQuestIds, skillStats
       };
     });
 
+  candidates.push(...getTodayProjectTasks()
+    .filter((task) => !task.completed)
+    .map((task) => {
+      const project = state.projects[task.projectId];
+      return {
+        projectId: task.projectId,
+        questId: task.id,
+        title: task.title,
+        category: "project",
+        type: "normal",
+        estimatedMinutes: task.estimatedMinutes === "unknown" ? Math.min(30, nowModeState.availableMinutes) : task.estimatedMinutes,
+        expectedExp: task.exp,
+        reason: `今日やるProject / 優先度${project?.priority || "-"}`,
+        priority: 100 - (project?.priority || 20)
+      };
+    }));
+
+  candidates.push(...getTodayLifeTasks()
+    .filter((task) => !task.completed)
+    .map((task) => ({
+      lifeTaskId: task.id,
+      questId: task.id,
+      title: task.title,
+      category: "life",
+      type: "lifeMaintenance",
+      estimatedMinutes: task.estimatedMinutes === "unknown" ? Math.min(30, nowModeState.availableMinutes) : task.estimatedMinutes,
+      expectedExp: 0,
+      reason: "今日やるLifeタスク。Inboxに入れただけのLifeは出していません。",
+      priority: getTimeBlock(currentTime) === "night" ? 85 : 45
+    })));
+
   candidates = dedupeBySkill(candidates.sort((a, b) => b.priority - a.priority));
   const suggestedQuests = spreadNowCandidatesByType(candidates, limit, nowModeState.availableMinutes).map((quest) => ({
     skillId: quest.skillId,
     questId: quest.questId,
+    lifeTaskId: quest.lifeTaskId,
+    projectId: quest.projectId,
     title: quest.title,
     category: quest.category,
     type: quest.type,
@@ -794,10 +1076,35 @@ function suggestOutsideQuests(nowModeState, allQuests, completedQuestIds, limit,
       reason: buildOutsideReason(quest, nowModeState)
     }))
     .sort((a, b) => b.priority - a.priority);
+  const todayPortable = [
+    ...getTodayProjectTasks().filter((task) => !task.completed).map((task) => ({
+      projectId: task.projectId,
+      questId: task.id,
+      title: task.title,
+      category: "project",
+      type: "normal",
+      estimatedMinutes: task.estimatedMinutes === "unknown" ? Math.min(30, nowModeState.availableMinutes) : task.estimatedMinutes,
+      expectedExp: task.exp,
+      priority: 95,
+      reason: "今日やるProject。外出先でも進められるなら拾える"
+    })),
+    ...getTodayLifeTasks().filter((task) => !task.completed).map((task) => ({
+      lifeTaskId: task.id,
+      questId: task.id,
+      title: task.title,
+      category: "life",
+      type: "lifeMaintenance",
+      estimatedMinutes: task.estimatedMinutes === "unknown" ? Math.min(30, nowModeState.availableMinutes) : task.estimatedMinutes,
+      expectedExp: 0,
+      priority: 50,
+      reason: "今日やるLifeタスク"
+    }))
+  ];
 
-  const suggestedQuests = spreadOutsideCandidates(candidates, limit).map((quest) => ({
+  const suggestedQuests = spreadOutsideCandidates([...todayPortable, ...candidates].sort((a, b) => b.priority - a.priority), limit).map((quest) => ({
     skillId: quest.skillId,
     projectId: quest.projectId,
+    lifeTaskId: quest.lifeTaskId,
     questId: quest.questId,
     title: quest.title,
     category: quest.category,
@@ -1062,12 +1369,174 @@ function getStaleSkills() {
 }
 
 function handleQuestClick(event) {
+  const projectButton = event.target.closest("[data-complete-today-project]");
+  if (projectButton) {
+    completeProjectTask(projectButton.dataset.completeTodayProject, "home");
+    return;
+  }
+  const lifeButton = event.target.closest("[data-complete-today-life]");
+  if (lifeButton) {
+    completeLifeTask(lifeButton.dataset.completeTodayLife, "home");
+    return;
+  }
   const button = event.target.closest("[data-complete-today]");
   if (!button) return;
   const daily = getToday();
   const quest = daily.quests.find((item) => item.id === button.dataset.completeToday);
   if (!quest || quest.completed) return;
   completeQuest(quest, "home");
+}
+
+function handleProjectClick(event) {
+  const addMilestone = event.target.closest("[data-add-milestone]");
+  if (addMilestone) {
+    const projectId = addMilestone.dataset.addMilestone;
+    const titleInput = document.querySelector(`[data-milestone-title="${projectId}"]`);
+    const deadlineInput = document.querySelector(`[data-milestone-deadline="${projectId}"]`);
+    const title = titleInput?.value.trim();
+    if (!title) return;
+    state.projects[projectId].milestones.push({
+      id: createId(`${Date.now()}-${projectId}-${title}`),
+      projectId,
+      title,
+      deadline: deadlineInput?.value || "",
+      status: "active",
+      tasks: []
+    });
+    titleInput.value = "";
+    if (deadlineInput) deadlineInput.value = "";
+    saveState();
+    renderAll();
+    return;
+  }
+
+  const addTask = event.target.closest("[data-add-project-task]");
+  if (addTask) {
+    const { projectId, milestoneId } = addTask.dataset;
+    const titleInput = document.querySelector(`[data-project-task-title="${projectId}-${milestoneId || "none"}"]`);
+    const todayInput = document.querySelector(`[data-project-task-today="${projectId}-${milestoneId || "none"}"]`);
+    const title = titleInput?.value.trim();
+    if (!title) return;
+    const task = createProjectTask(projectId, milestoneId || "", title, { addedToToday: Boolean(todayInput?.checked) });
+    if (task.addedToToday) getToday().projectTaskIds.push(task.id);
+    titleInput.value = "";
+    if (todayInput) todayInput.checked = false;
+    saveState();
+    renderAll();
+    return;
+  }
+
+  const complete = event.target.closest("[data-complete-project-task]");
+  if (complete) {
+    completeProjectTask(complete.dataset.completeProjectTask, "project");
+  }
+}
+
+function createProjectTask(projectId, milestoneId, title, options = {}) {
+  const project = state.projects[projectId];
+  const task = {
+    id: createId(`${Date.now()}-${projectId}-${title}`),
+    projectId,
+    milestoneId,
+    title,
+    dueDate: "",
+    estimatedMinutes: "unknown",
+    exp: 20,
+    completed: false,
+    addedToToday: Boolean(options.addedToToday),
+    sourceInboxId: options.sourceInboxId || "",
+    createdAt: new Date().toISOString()
+  };
+  if (milestoneId) {
+    const milestone = project.milestones.find((item) => item.id === milestoneId);
+    milestone?.tasks.push(task);
+  } else {
+    project.tasks = project.tasks || [];
+    project.tasks.push(task);
+  }
+  return task;
+}
+
+function createLifeTask(title, lifeArea, options = {}) {
+  const task = {
+    id: createId(`${Date.now()}-life-${title}`),
+    title,
+    lifeArea,
+    dueDate: "",
+    estimatedMinutes: "unknown",
+    addedToToday: Boolean(options.addedToToday),
+    completed: false,
+    sourceInboxId: options.sourceInboxId || "",
+    createdAt: new Date().toISOString()
+  };
+  state.lifeTasks.unshift(task);
+  return task;
+}
+
+function completeProjectTask(taskId, source) {
+  const found = findProjectTask(taskId);
+  if (!found || found.task.completed) return;
+  const { project, milestone, task } = found;
+  task.completed = true;
+  project.exp = (project.exp || 0) + task.exp;
+  project.progress = (project.progress || 0) + task.exp;
+  updateMilestoneStatus(milestone);
+  state.projectLogs.unshift({
+    id: createId(`${Date.now()}-${task.id}`),
+    date: todayKey(),
+    projectId: project.id,
+    milestoneId: milestone?.id,
+    questId: task.id,
+    title: task.title,
+    expGained: task.exp,
+    source,
+    category: "project",
+    type: "normal",
+    completedAt: new Date().toISOString()
+  });
+  state.questHistory.push({
+    id: createId(`${Date.now()}-${project.id}-${task.id}`),
+    date: todayKey(),
+    domain: "project",
+    projectId: project.id,
+    milestoneId: milestone?.id,
+    questId: task.id,
+    title: task.title,
+    expGained: task.exp,
+    exp: task.exp,
+    category: "project",
+    type: "normal",
+    source,
+    completedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  });
+  state.managerComment = `${project.name}を進めたな。小さい作業でも、締切前には効いてくる。`;
+  saveState();
+  renderAll();
+}
+
+function completeLifeTask(taskId, source) {
+  const task = state.lifeTasks.find((item) => item.id === taskId);
+  if (!task || task.completed) return;
+  task.completed = true;
+  state.questHistory.push({
+    id: createId(`${Date.now()}-life-${task.id}`),
+    date: todayKey(),
+    domain: "life",
+    lifeArea: task.lifeArea,
+    questId: task.id,
+    title: task.title,
+    expGained: 0,
+    exp: 0,
+    category: "life",
+    type: "lifeMaintenance",
+    source,
+    completedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString()
+  });
+  state.managerComment = "生活を整えたな。こういうのを放置しないのも実力だ。";
+  saveState();
+  renderAll();
 }
 
 function handleManualQuestClick(event) {
@@ -1097,6 +1566,14 @@ function handleNowCompleteClick(event) {
   const now = state.nowMode || {};
   const quest = (now.suggestedQuests || []).find((item) => item.questId === button.dataset.completeNow);
   if (!quest || quest.completed) return;
+  if (quest.lifeTaskId) {
+    completeLifeTask(quest.lifeTaskId, "nowMode");
+    return;
+  }
+  if (quest.projectId && findProjectTask(quest.questId)) {
+    completeProjectTask(quest.questId, "nowMode");
+    return;
+  }
 
   completeQuest(
     {
@@ -1353,6 +1830,8 @@ function renderAll() {
   renderTodayQuests();
   renderSkillMini();
   renderSkills();
+  renderProjects();
+  renderInbox();
   renderManualQuests();
   renderRatingGrid();
   renderEnglishLogs();
@@ -1409,18 +1888,35 @@ function renderNowSuggestionCard(quest) {
 
 function renderHomeStats() {
   const daily = getToday();
-  const completed = daily.quests.filter((item) => item.completed);
-  const total = daily.quests.length;
+  const todayProjectTasks = getTodayProjectTasks();
+  const todayLifeTasks = getTodayLifeTasks();
+  const completed = [
+    ...daily.quests.filter((item) => item.completed),
+    ...todayProjectTasks.filter((item) => item.completed),
+    ...todayLifeTasks.filter((item) => item.completed)
+  ];
+  const total = daily.quests.length + todayProjectTasks.length + todayLifeTasks.length;
   dom.todayExp.textContent = String(getTodayExp());
+  dom.todayProjectExp.textContent = String(getTodayProjectExp());
+  dom.todayLifeCount.textContent = String(getTodayLifeCount());
   dom.todayRate.textContent = total ? `${Math.round((completed.length / total) * 100)}%` : "0%";
 }
 
 function renderTodayQuests() {
   const daily = getToday();
-  dom.todayQuestList.innerHTML = daily.quests.length
+  const projectTasks = getTodayProjectTasks();
+  const lifeTasks = getTodayLifeTasks();
+  const skillHtml = daily.quests.length
     ? daily.blocks?.length
       ? renderMorningBlockPlan(daily)
       : daily.quests.map((quest) => renderQuestCard(quest)).join("")
+    : "";
+  const extraHtml = [
+    ...projectTasks.map(renderTodayProjectTask),
+    ...lifeTasks.map(renderTodayLifeTask)
+  ].join("");
+  dom.todayQuestList.innerHTML = skillHtml || extraHtml
+    ? `${skillHtml}${extraHtml}`
     : `<div class="empty">朝の入力をして「今日のクエスト提案」を押してください。忙しい日でもゼロにしない設計です。</div>`;
 }
 
@@ -1457,6 +1953,162 @@ function renderQuestCard(quest, block = null) {
       <div class="quest-side">
         <strong>${quest.estimatedMinutes ? `${quest.estimatedMinutes}分 / ` : ""}+${quest.exp} EXP</strong>
         <button class="complete-btn" data-complete-today="${quest.id}" ${quest.completed ? "disabled" : ""}>${quest.completed ? "完了済み" : "達成"}</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderTodayProjectTask(task) {
+  const project = state.projects[task.projectId] || { name: "Project", color: "#94a3b8" };
+  return `
+    <article class="quest-card ${task.completed ? "is-done" : ""}" style="--skill: ${project.color}">
+      <div>
+        <span class="quest-tag">Project / ${escapeHtml(project.name)}</span>
+        <h3>${escapeHtml(task.title)}</h3>
+      </div>
+      <div class="quest-side">
+        <strong>+${task.exp} EXP</strong>
+        <button class="complete-btn" data-complete-today-project="${escapeHtml(task.id)}" ${task.completed ? "disabled" : ""}>${task.completed ? "完了済み" : "達成"}</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderTodayLifeTask(task) {
+  return `
+    <article class="quest-card ${task.completed ? "is-done" : ""}" style="--skill: #94a3b8">
+      <div>
+        <span class="quest-tag">Life / ${escapeHtml(lifeAreaLabel(task.lifeArea))}</span>
+        <h3>${escapeHtml(task.title)}</h3>
+      </div>
+      <div class="quest-side">
+        <strong>EXPなし</strong>
+        <button class="complete-btn" data-complete-today-life="${escapeHtml(task.id)}" ${task.completed ? "disabled" : ""}>${task.completed ? "完了済み" : "達成"}</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderProjects() {
+  if (!dom.projectList) return;
+  dom.projectList.innerHTML = Object.values(state.projects)
+    .sort((a, b) => (a.priority || 99) - (b.priority || 99))
+    .map(renderProjectCard)
+    .join("");
+}
+
+function renderProjectCard(project) {
+  const tasks = getProjectTasks(project);
+  const completed = tasks.filter((task) => task.completed).length;
+  const progress = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+  return `
+    <article class="project-card" style="--skill: ${project.color}">
+      <div class="skill-card-head">
+        <div>
+          <p class="eyebrow">Priority ${project.priority || "-"}</p>
+          <h3>${escapeHtml(project.name)}</h3>
+        </div>
+        <span class="level-badge">${project.exp || 0} EXP</span>
+      </div>
+      <p>${escapeHtml(project.goal)}</p>
+      <div class="exp-bar"><i style="width:${progress}%"></i></div>
+      <small>${completed}/${tasks.length} tasks done</small>
+      <div class="project-add-row">
+        <input data-milestone-title="${escapeHtml(project.id)}" placeholder="Milestoneを追加" />
+        <input data-milestone-deadline="${escapeHtml(project.id)}" type="date" />
+        <button class="secondary-btn compact" data-add-milestone="${escapeHtml(project.id)}">追加</button>
+      </div>
+      ${renderProjectLooseTasks(project)}
+      ${(project.milestones || []).map((milestone) => renderMilestone(project, milestone)).join("")}
+    </article>
+  `;
+}
+
+function renderProjectLooseTasks(project) {
+  project.tasks = project.tasks || [];
+  return `
+    <section class="milestone-card">
+      <h4>Project直下タスク</h4>
+      <div class="project-add-row">
+        <input data-project-task-title="${escapeHtml(project.id)}-none" placeholder="Taskを追加" />
+        <label class="inline-check"><input data-project-task-today="${escapeHtml(project.id)}-none" type="checkbox" /> 今日やる</label>
+        <button class="secondary-btn compact" data-add-project-task data-project-id="${escapeHtml(project.id)}" data-milestone-id="">追加</button>
+      </div>
+      ${project.tasks.length ? project.tasks.map((task) => renderProjectTask(task)).join("") : `<div class="mini-empty">まだタスクなし</div>`}
+    </section>
+  `;
+}
+
+function renderMilestone(project, milestone) {
+  return `
+    <section class="milestone-card">
+      <div class="skill-card-head">
+        <div>
+          <h4>${escapeHtml(milestone.title)}</h4>
+          <small>${milestone.deadline ? `締切: ${escapeHtml(milestone.deadline)}` : "締切未設定"}</small>
+        </div>
+        <span class="quest-tag">${escapeHtml(statusLabel(milestone.status))}</span>
+      </div>
+      <div class="project-add-row">
+        <input data-project-task-title="${escapeHtml(project.id)}-${escapeHtml(milestone.id)}" placeholder="Taskを追加" />
+        <label class="inline-check"><input data-project-task-today="${escapeHtml(project.id)}-${escapeHtml(milestone.id)}" type="checkbox" /> 今日やる</label>
+        <button class="secondary-btn compact" data-add-project-task data-project-id="${escapeHtml(project.id)}" data-milestone-id="${escapeHtml(milestone.id)}">追加</button>
+      </div>
+      ${milestone.tasks?.length ? milestone.tasks.map((task) => renderProjectTask(task)).join("") : `<div class="mini-empty">まだタスクなし</div>`}
+    </section>
+  `;
+}
+
+function renderProjectTask(task) {
+  return `
+    <article class="manual-quest ${task.completed ? "is-done" : ""}">
+      <span>${task.addedToToday ? "今日やる" : "Project"}</span>
+      <b>${escapeHtml(task.title)}</b>
+      <em>+${task.exp} EXP</em>
+      <button class="secondary-btn compact" data-complete-project-task="${escapeHtml(task.id)}" ${task.completed ? "disabled" : ""}>${task.completed ? "完了済み" : "完了"}</button>
+    </article>
+  `;
+}
+
+function renderInbox() {
+  if (dom.homeInboxPreview) {
+    const recent = (state.inboxItems || []).filter((item) => item.status !== "converted").slice(0, 3);
+    dom.homeInboxPreview.innerHTML = recent.length
+      ? recent.map((item) => `<span>${escapeHtml(item.title)} / ${escapeHtml(domainLabel(item.domain))}</span>`).join("")
+      : `<span>Inboxは空です。</span>`;
+  }
+  if (!dom.inboxList) return;
+  const items = state.inboxItems || [];
+  dom.inboxList.innerHTML = items.length
+    ? items.map(renderInboxItem).join("")
+    : `<div class="empty">Inboxはまだ空です。複数行で一気に入れて大丈夫です。</div>`;
+}
+
+function renderInboxItem(item) {
+  return `
+    <article class="inbox-item ${item.status === "converted" ? "is-done" : ""}">
+      <div>
+        <span class="quest-tag">${escapeHtml(domainLabel(item.domain))}${item.status === "converted" ? " / 変換済み" : ""}</span>
+        <h3>${escapeHtml(item.title)}</h3>
+      </div>
+      <div class="inbox-controls">
+        <select data-inbox-field="domain" data-inbox-id="${escapeHtml(item.id)}">
+          ${["inbox", "skill", "project", "life"].map((domain) => `<option value="${domain}" ${item.domain === domain ? "selected" : ""}>${domainLabel(domain)}</option>`).join("")}
+        </select>
+        <select data-inbox-field="skillId" data-inbox-id="${escapeHtml(item.id)}">
+          <option value="">Skillなし</option>
+          ${Object.values(state.skills).map((skill) => `<option value="${skill.id}" ${item.skillId === skill.id ? "selected" : ""}>${escapeHtml(skill.name)}</option>`).join("")}
+        </select>
+        <select data-inbox-field="projectId" data-inbox-id="${escapeHtml(item.id)}">
+          <option value="">Projectなし</option>
+          ${Object.values(state.projects).map((project) => `<option value="${project.id}" ${item.projectId === project.id ? "selected" : ""}>${escapeHtml(project.name)}</option>`).join("")}
+        </select>
+        <select data-inbox-field="lifeArea" data-inbox-id="${escapeHtml(item.id)}">
+          <option value="">Lifeなし</option>
+          ${Object.entries(lifeAreas).map(([id, label]) => `<option value="${id}" ${item.lifeArea === id ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+        </select>
+        <button class="secondary-btn compact" data-inbox-today="${escapeHtml(item.id)}" ${item.status === "converted" ? "disabled" : ""}>今日やる</button>
+        <button class="danger-btn compact" data-inbox-remove="${escapeHtml(item.id)}">削除</button>
       </div>
     </article>
   `;
@@ -1521,7 +2173,7 @@ function renderManualQuests() {
 
 function renderRatingGrid() {
   const skillId = dom.imageSkillInput?.value || "illustration";
-  dom.ratingGrid.innerHTML = ratingLabels[skillId].map((label) => `
+  dom.ratingGrid.innerHTML = (ratingLabels[skillId] || ratingLabels.illustration).map((label) => `
     <label class="field">
       <span>${escapeHtml(label)}</span>
       <select data-rating="${escapeHtml(label)}">
@@ -1594,13 +2246,101 @@ function isQuestCompletedToday(questId) {
 function getQuestOwner(quest) {
   if (quest.skillId) return state.skills[quest.skillId] || skillSeeds[quest.skillId] || skillSeeds.english;
   if (quest.projectId) return state.projects?.[quest.projectId] || projectSeeds[quest.projectId] || { name: "プロジェクト", color: "#94a3b8" };
+  if (quest.lifeTaskId || quest.category === "life") return { name: "Life", color: "#94a3b8" };
   return { name: "タスク", color: "#94a3b8" };
 }
 
 function getLogOwnerName(log) {
   if (log.skillId) return state.skills[log.skillId]?.name || skillSeeds[log.skillId]?.name || "スキル";
   if (log.projectId) return state.projects?.[log.projectId]?.name || projectSeeds[log.projectId]?.name || "プロジェクト";
+  if (log.domain === "life" || log.lifeArea) return "Life";
   return "タスク";
+}
+
+function mergeProjects(existingProjects) {
+  const merged = structuredCloneSafe(projectSeeds);
+  Object.entries(existingProjects || {}).forEach(([id, project]) => {
+    merged[id] = {
+      ...(merged[id] || {}),
+      ...project,
+      exp: project.exp ?? project.progress ?? merged[id]?.exp ?? 0,
+      progress: project.progress ?? 0,
+      status: project.status || "active",
+      milestones: project.milestones || merged[id]?.milestones || [],
+      tasks: project.tasks || []
+    };
+    if (id === "graduation_thesis" && project.goal === "12月提出に向けて、8月末までに分析の目処をつける") {
+      merged[id].goal = projectSeeds.graduation_thesis.goal;
+    }
+  });
+  return merged;
+}
+
+function getProjectTasks(project) {
+  return [
+    ...(project.tasks || []),
+    ...(project.milestones || []).flatMap((milestone) => milestone.tasks || [])
+  ];
+}
+
+function findProjectTask(taskId) {
+  for (const project of Object.values(state.projects)) {
+    const loose = (project.tasks || []).find((task) => task.id === taskId);
+    if (loose) return { project, milestone: null, task: loose };
+    for (const milestone of project.milestones || []) {
+      const task = (milestone.tasks || []).find((item) => item.id === taskId);
+      if (task) return { project, milestone, task };
+    }
+  }
+  return null;
+}
+
+function updateMilestoneStatus(milestone) {
+  if (!milestone) return;
+  const tasks = milestone.tasks || [];
+  if (tasks.length && tasks.every((task) => task.completed)) milestone.status = "done";
+}
+
+function getTodayProjectTasks() {
+  const ids = new Set(getToday()?.projectTaskIds || []);
+  return Object.values(state.projects).flatMap(getProjectTasks).filter((task) => ids.has(task.id));
+}
+
+function getTodayLifeTasks() {
+  const ids = new Set(getToday()?.lifeTaskIds || []);
+  return (state.lifeTasks || []).filter((task) => ids.has(task.id));
+}
+
+function getTodayProjectExp() {
+  return state.questHistory
+    .filter((item) => item.date === todayKey() && item.projectId)
+    .reduce((sum, item) => sum + (item.expGained ?? item.exp ?? 0), 0);
+}
+
+function getTodayLifeCount() {
+  return state.questHistory.filter((item) => item.date === todayKey() && (item.domain === "life" || item.lifeArea)).length;
+}
+
+function domainLabel(domain) {
+  return {
+    skill: "Skill",
+    project: "Project",
+    life: "Life",
+    inbox: "未分類"
+  }[domain] || "未分類";
+}
+
+function lifeAreaLabel(area) {
+  return lifeAreas[area] || "その他";
+}
+
+function statusLabel(status) {
+  return {
+    active: "進行中",
+    done: "完了",
+    paused: "保留",
+    completed: "完了"
+  }[status] || status || "進行中";
 }
 
 function markQuestCompletedEverywhere(questId) {
@@ -1625,7 +2365,10 @@ function normalizeSource(source) {
     questList: "questList",
     nowMode: "nowMode",
     englishLog: "englishLog",
-    imageLog: "imageLog"
+    imageLog: "imageLog",
+    project: "project",
+    life: "life",
+    inbox: "inbox"
   }[source] || source || "home";
 }
 
@@ -1641,7 +2384,10 @@ function sourceLabel(source) {
     questList: "クエスト画面経由",
     nowMode: "Now Mode経由",
     englishLog: "英語ログ経由",
-    imageLog: "画像ログ経由"
+    imageLog: "画像ログ経由",
+    project: "Project画面経由",
+    life: "Life経由",
+    inbox: "Inbox経由"
   }[normalizeSource(source)] || source || "不明";
 }
 
@@ -1649,6 +2395,7 @@ function categoryLabel(category) {
   return {
     skill: "スキル",
     project: "プロジェクト",
+    life: "Life",
     preparation: "準備",
     review: "見直し",
     memo: "メモ",
@@ -1664,6 +2411,7 @@ function typeLabel(type) {
     corePractice: "基礎練",
     normal: "通常",
     reflection: "振り返り",
+    lifeMaintenance: "Life",
     "小さい行動": "準備",
     "通常練習": "通常",
     "振り返り・改善": "振り返り"

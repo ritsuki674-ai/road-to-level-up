@@ -114,7 +114,7 @@ h3 {
 .nav {
   z-index: 10;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(9, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 16px;
   border: 1px solid var(--line);
@@ -153,6 +153,7 @@ h3 {
 .scoreboard,
 .mini-skill,
 .skill-card,
+.project-card,
 .quest-group,
 .settings-card {
   border: 1px solid var(--line);
@@ -344,6 +345,7 @@ h3 {
 }
 
 .skill-grid,
+.project-grid,
 .tables-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -548,8 +550,16 @@ textarea:focus {
   padding: 18px;
 }
 
+.project-card {
+  display: grid;
+  gap: 14px;
+  border-top: 6px solid var(--skill);
+  padding: 18px;
+}
+
 .skill-card p,
 .skill-card li,
+.project-card p,
 .settings-card p,
 .history-item span,
 .image-log-card p,
@@ -591,6 +601,58 @@ textarea:focus {
   color: #ffcf8a;
   font-style: normal;
   font-weight: 900;
+}
+
+.project-add-row,
+.inbox-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.milestone-card,
+.inbox-item,
+.inbox-preview {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.inbox-preview {
+  margin-top: 12px;
+}
+
+.inbox-preview span,
+.mini-empty {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.inbox-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.inbox-item h3 {
+  margin: 8px 0 0;
+}
+
+.inline-check {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--muted);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.inline-check input {
+  width: auto;
 }
 
 .image-log-layout {
@@ -708,6 +770,7 @@ textarea:focus {
   .now-layout,
   .image-log-layout,
   .skill-grid,
+  .project-grid,
   .tables-grid,
   .form-grid,
   .now-controls,
@@ -720,6 +783,11 @@ textarea:focus {
 
   .scoreboard {
     min-width: 0;
+  }
+
+  .project-add-row,
+  .inbox-controls {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -742,6 +810,7 @@ textarea:focus {
   .quest-card,
   .now-suggestion-card,
   .manual-quest,
+  .inbox-item,
   .section-head,
   .skill-card-head {
     display: grid;

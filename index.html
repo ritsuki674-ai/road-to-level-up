@@ -11,8 +11,8 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=road-level-up-pwa4" />
-    <script src="./app.js?v=road-level-up-pwa4" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=road-level-up-pwa6" />
+    <script src="./app.js?v=road-level-up-pwa6" defer></script>
   </head>
   <body>
     <div class="app">
@@ -27,6 +27,8 @@
       <nav class="nav" aria-label="画面切り替え">
         <button class="nav-btn is-active" data-view="home">ホーム</button>
         <button class="nav-btn" data-view="skills">スキル</button>
+        <button class="nav-btn" data-view="projects">Project</button>
+        <button class="nav-btn" data-view="inbox">Inbox</button>
         <button class="nav-btn" data-view="quests">クエスト</button>
         <button class="nav-btn" data-view="english">英語ログ</button>
         <button class="nav-btn" data-view="images">画像ログ</button>
@@ -53,7 +55,30 @@
                 <span>達成率</span>
                 <b id="todayRate">0%</b>
               </div>
+              <div class="score-row">
+                <span>Project EXP</span>
+                <b id="todayProjectExp">0</b>
+              </div>
+              <div class="score-row">
+                <span>Life完了</span>
+                <b id="todayLifeCount">0</b>
+              </div>
             </article>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Inbox</p>
+                <h2>思いついたこと</h2>
+              </div>
+              <button class="primary-btn" id="addInboxBtn">Inboxに追加</button>
+            </div>
+            <label class="field">
+              <span>改行ごとにタスクとして保存</span>
+              <textarea id="homeInboxInput" rows="4" placeholder="例：&#10;卒論PDFを読む&#10;先生にメールする&#10;洗濯する"></textarea>
+            </label>
+            <div class="inbox-preview" id="homeInboxPreview"></div>
           </section>
 
           <section class="panel now-panel">
@@ -164,6 +189,35 @@
               </div>
             </div>
             <div class="skill-grid" id="skillList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-projects">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Projects</p>
+                <h2>プロジェクト</h2>
+              </div>
+            </div>
+            <div class="project-grid" id="projectList"></div>
+          </section>
+        </section>
+
+        <section class="view" id="view-inbox">
+          <section class="panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Inbox</p>
+                <h2>Inbox分類</h2>
+              </div>
+              <button class="primary-btn" id="addInboxPageBtn">Inboxに追加</button>
+            </div>
+            <label class="field">
+              <span>複数行入力</span>
+              <textarea id="inboxInput" rows="5" placeholder="- 歯医者を予約する&#10;- 卒論資料を探す&#10;- 小説のネタを書く"></textarea>
+            </label>
+            <div class="inbox-list" id="inboxList"></div>
           </section>
         </section>
 

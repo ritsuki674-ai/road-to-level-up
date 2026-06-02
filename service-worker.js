@@ -1,10 +1,10 @@
-const CACHE_VERSION = "road-to-level-up-pwa4";
+const CACHE_VERSION = "road-to-level-up-pwa6";
 const APP_CACHE = `road-to-level-up-${CACHE_VERSION}`;
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=road-level-up-pwa4",
-  "./app.js?v=road-level-up-pwa4",
+  "./styles.css?v=road-level-up-pwa6",
+  "./app.js?v=road-level-up-pwa6",
   "./manifest.webmanifest",
   "./icon.svg"
 ];

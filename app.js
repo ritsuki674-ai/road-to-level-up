@@ -1,5 +1,5 @@
 const STORAGE_KEY = "road-to-level-up-mvp-v1";
-const APP_VERSION = "road-level-up-pwa6";
+const APP_VERSION = "road-level-up-pwa7";
 
 const levelTable = [
   { level: 1, exp: 0 },

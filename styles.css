@@ -17,6 +17,12 @@
 
 * {
   box-sizing: border-box;
+  min-width: 0;
+}
+
+html {
+  overflow-x: hidden;
+  background: #090d18;
 }
 
 body {
@@ -27,6 +33,8 @@ body {
     radial-gradient(circle at 18% -8%, rgba(249, 115, 22, 0.3), transparent 28rem),
     radial-gradient(circle at 88% 2%, rgba(139, 92, 246, 0.3), transparent 25rem),
     linear-gradient(135deg, #07111f, #0d1425 52%, #101020);
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 button,
@@ -44,6 +52,7 @@ button {
   width: min(1180px, calc(100% - 24px));
   margin: 0 auto;
   padding: 20px 0 60px;
+  overflow-x: clip;
 }
 
 .topbar,
@@ -179,6 +188,7 @@ h3 {
   margin-bottom: 0;
   color: var(--muted);
   line-height: 1.75;
+  overflow-wrap: anywhere;
 }
 
 .avatar-frame {

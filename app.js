@@ -1,5 +1,5 @@
 const STORAGE_KEY = "road-to-level-up-mvp-v1";
-const APP_VERSION = "road-level-up-pwa7";
+const APP_VERSION = "road-level-up-pwa8";
 
 const levelTable = [
   { level: 1, exp: 0 },
@@ -151,8 +151,8 @@ const lifeAreas = {
 };
 
 const classificationRules = [
-  rule(["卒論", "論文", "文献", "先生", "分析"], "project", { projectId: "graduation_thesis" }),
-  rule(["町おこし", "地域", "課題"], "project", { projectId: "community_revival" }),
+  rule(["町おこし", "地域"], "project", { projectId: "community_revival" }),
+  rule(["卒論", "論文", "文献", "先生", "分析", "課題", "レポート"], "project", { projectId: "graduation_thesis" }),
   rule(["起業", "収益化", "事業"], "project", { projectId: "startup" }),
   rule(["Road to Level Up", "アプリ", "バグ"], "project", { projectId: "road_level_up_dev" }),
   rule(["小説", "キャラクター", "世界観", "台詞"], "project", { projectId: "novel" }),
@@ -384,6 +384,7 @@ function cacheDom() {
     "homeInboxInput",
     "homeInboxPreview",
     "addInboxBtn",
+    "dueReminderList",
     "sleepInput",
     "wakeInput",
     "availableInput",
@@ -454,6 +455,7 @@ function bindEvents() {
   dom.inboxList?.addEventListener("click", handleInboxClick);
   dom.inboxList?.addEventListener("change", handleInboxChange);
   dom.projectList?.addEventListener("click", handleProjectClick);
+  dom.dueReminderList?.addEventListener("click", handleDueReminderClick);
   dom.nowSuggestBtn.addEventListener("click", handleNowSuggest);
   dom.nowSuggestionList.addEventListener("click", handleNowCompleteClick);
   dom.todayQuestList.addEventListener("click", handleQuestClick);
@@ -534,6 +536,8 @@ function ensureToday() {
   state.projectLogs = state.projectLogs || [];
   state.inboxItems = state.inboxItems || [];
   state.lifeTasks = state.lifeTasks || [];
+  normalizeInboxDueFields();
+  normalizeProjectTaskDueFields();
   state.daily[key] = state.daily[key] || {
     date: key,
     sleepHours: 6.5,
@@ -605,6 +609,7 @@ function parseInboxLines(value) {
 
 function createInboxItem(title) {
   const classified = classifyInboxTitle(title);
+  const due = parseDueDateFromText(title);
   return {
     id: createId(`${Date.now()}-${Math.random()}-${title}`),
     title,
@@ -616,8 +621,101 @@ function createInboxItem(title) {
     skillId: classified.skillId,
     projectId: classified.projectId,
     lifeArea: classified.lifeArea,
-    estimatedMinutes: "unknown"
+    estimatedMinutes: "unknown",
+    dueDate: due.date || "",
+    dueLabel: due.label || "期限なし",
+    dueSource: due.source || ""
   };
+}
+
+function normalizeInboxDueFields() {
+  state.inboxItems.forEach((item) => {
+    if (!("dueDate" in item) || !("dueLabel" in item)) {
+      const due = parseDueDateFromText(item.title);
+      item.dueDate = item.dueDate || due.date || "";
+      item.dueLabel = item.dueLabel || due.label || "期限なし";
+      item.dueSource = item.dueSource || due.source || "";
+    }
+  });
+}
+
+function normalizeProjectTaskDueFields() {
+  Object.values(state.projects || {}).forEach((project) => {
+    getProjectTasks(project).forEach((task) => {
+      if (!("dueDate" in task) || !("dueLabel" in task)) {
+        const due = parseDueDateFromText(task.title);
+        task.dueDate = task.dueDate || due.date || "";
+        task.dueLabel = task.dueLabel || due.label || "期限なし";
+        task.dueSource = task.dueSource || due.source || "";
+      }
+    });
+  });
+}
+
+function parseDueDateFromText(text, baseDate = new Date()) {
+  const value = String(text || "");
+  const year = baseDate.getFullYear();
+  const monthDay = value.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if (monthDay) {
+    const month = Number(monthDay[1]);
+    const day = Number(monthDay[2]);
+    const date = new Date(year, month - 1, day);
+    if (date < startOfDay(baseDate)) date.setFullYear(year + 1);
+    return { date: todayKey(date), label: `${month}月${day}日`, source: monthDay[0] };
+  }
+
+  const slashDate = value.match(/(\d{1,2})\s*[/-]\s*(\d{1,2})/);
+  if (slashDate) {
+    const month = Number(slashDate[1]);
+    const day = Number(slashDate[2]);
+    const date = new Date(year, month - 1, day);
+    if (date < startOfDay(baseDate)) date.setFullYear(year + 1);
+    return { date: todayKey(date), label: `${month}月${day}日`, source: slashDate[0] };
+  }
+
+  const dayOnly = value.match(/(?:^|[^\d月])(\d{1,2})\s*日(?:まで|迄|締切|〆)?/);
+  if (dayOnly) {
+    const day = Number(dayOnly[1]);
+    const date = new Date(year, baseDate.getMonth(), day);
+    if (date < startOfDay(baseDate)) date.setMonth(date.getMonth() + 1);
+    return { date: todayKey(date), label: `${date.getMonth() + 1}月${day}日`, source: dayOnly[0].trim() };
+  }
+
+  const normalized = value.replace(/\s/g, "");
+  if (/今日中|今日まで|本日中|本日まで/.test(normalized)) return relativeDue(baseDate, 0, "今日");
+  if (/明日中|明日まで/.test(normalized)) return relativeDue(baseDate, 1, "明日");
+  if (/明後日中|明後日まで/.test(normalized)) return relativeDue(baseDate, 2, "明後日");
+  if (/来週末|来週中|来週まで/.test(normalized)) return { date: todayKey(endOfWeek(addDays(baseDate, 7))), label: "来週中", source: "来週" };
+  if (/今週末|週末まで|今週中|今週まで/.test(normalized)) return { date: todayKey(endOfWeek(baseDate)), label: "今週中", source: "今週" };
+  if (/来月中|来月末|来月まで/.test(normalized)) return { date: todayKey(endOfMonth(new Date(year, baseDate.getMonth() + 1, 1))), label: "来月中", source: "来月" };
+  if (/今月中|月末まで|今月末|今月まで/.test(normalized)) return { date: todayKey(endOfMonth(baseDate)), label: "今月中", source: "今月" };
+  return { date: "", label: "期限なし", source: "" };
+}
+
+function relativeDue(baseDate, offsetDays, label) {
+  return { date: todayKey(addDays(baseDate, offsetDays)), label, source: label };
+}
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date, days) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function endOfWeek(date) {
+  const next = startOfDay(date);
+  const day = next.getDay();
+  const daysUntilSunday = day === 0 ? 0 : 7 - day;
+  next.setDate(next.getDate() + daysUntilSunday);
+  return next;
+}
+
+function endOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
 function classifyInboxTitle(title) {
@@ -647,13 +745,18 @@ function handleInboxChange(event) {
     if (field.value !== "life") item.lifeArea = "";
   }
   saveState();
-  renderInbox();
+  renderAll();
 }
 
 function handleInboxClick(event) {
   const addToday = event.target.closest("[data-inbox-today]");
   if (addToday) {
     convertInboxToToday(addToday.dataset.inboxToday);
+    return;
+  }
+  const taskOnly = event.target.closest("[data-inbox-task]");
+  if (taskOnly) {
+    convertInboxToProjectTask(taskOnly.dataset.inboxTask, false);
     return;
   }
   const remove = event.target.closest("[data-inbox-remove]");
@@ -664,14 +767,38 @@ function handleInboxClick(event) {
   }
 }
 
+function handleDueReminderClick(event) {
+  const inboxToday = event.target.closest("[data-reminder-inbox-today]");
+  if (inboxToday) {
+    convertInboxToProjectTask(inboxToday.dataset.reminderInboxToday, true);
+    return;
+  }
+
+  const inboxTask = event.target.closest("[data-reminder-inbox-task]");
+  if (inboxTask) {
+    convertInboxToProjectTask(inboxTask.dataset.reminderInboxTask, false);
+    return;
+  }
+
+  const projectToday = event.target.closest("[data-reminder-project-today]");
+  if (projectToday) {
+    addProjectTaskToToday(projectToday.dataset.reminderProjectToday);
+    return;
+  }
+
+  const projectComplete = event.target.closest("[data-reminder-project-complete]");
+  if (projectComplete) {
+    completeProjectTask(projectComplete.dataset.reminderProjectComplete, "home");
+  }
+}
+
 function convertInboxToToday(inboxId) {
   const item = state.inboxItems.find((entry) => entry.id === inboxId);
   if (!item) return;
   const domain = item.domain === "inbox" ? item.suggestedDomain : item.domain;
   if (domain === "project" && item.projectId) {
-    const task = createProjectTask(item.projectId, "", item.title, { addedToToday: true, sourceInboxId: item.id });
-    getToday().projectTaskIds.push(task.id);
-    item.status = "converted";
+    convertInboxToProjectTask(inboxId, true);
+    return;
   } else if (domain === "life") {
     const task = createLifeTask(item.title, item.lifeArea || "other", { addedToToday: true, sourceInboxId: item.id });
     getToday().lifeTaskIds.push(task.id);
@@ -688,6 +815,24 @@ function convertInboxToToday(inboxId) {
     return;
   }
   state.managerComment = "今日やることに入れた。入れただけで満足するなよ、次は完了だ。";
+  saveState();
+  renderAll();
+}
+
+function convertInboxToProjectTask(inboxId, addToToday) {
+  const item = state.inboxItems.find((entry) => entry.id === inboxId);
+  if (!item || !item.projectId) return;
+  const task = createProjectTask(item.projectId, "", item.title, {
+    addedToToday: addToToday,
+    sourceInboxId: item.id,
+    dueDate: item.dueDate,
+    dueLabel: item.dueLabel
+  });
+  if (addToToday) getToday().projectTaskIds.push(task.id);
+  item.status = "converted";
+  state.managerComment = addToToday
+    ? "Projectタスクにして今日やることにも入れた。忘れる前に一個進めろ。"
+    : "Projectタスクに変換した。メモで終わらせず、ちゃんと置き場所を作ったな。";
   saveState();
   renderAll();
 }
@@ -1388,6 +1533,24 @@ function handleQuestClick(event) {
 }
 
 function handleProjectClick(event) {
+  const addTodayInbox = event.target.closest("[data-inbox-today]");
+  if (addTodayInbox) {
+    convertInboxToToday(addTodayInbox.dataset.inboxToday);
+    return;
+  }
+
+  const taskOnlyInbox = event.target.closest("[data-inbox-task]");
+  if (taskOnlyInbox) {
+    convertInboxToProjectTask(taskOnlyInbox.dataset.inboxTask, false);
+    return;
+  }
+
+  const addTodayProject = event.target.closest("[data-add-project-task-today]");
+  if (addTodayProject) {
+    addProjectTaskToToday(addTodayProject.dataset.addProjectTaskToday);
+    return;
+  }
+
   const addMilestone = event.target.closest("[data-add-milestone]");
   if (addMilestone) {
     const projectId = addMilestone.dataset.addMilestone;
@@ -1434,12 +1597,16 @@ function handleProjectClick(event) {
 
 function createProjectTask(projectId, milestoneId, title, options = {}) {
   const project = state.projects[projectId];
+  const parsedDue = parseDueDateFromText(title);
+  const dueDate = options.dueDate || parsedDue.date || "";
   const task = {
     id: createId(`${Date.now()}-${projectId}-${title}`),
     projectId,
     milestoneId,
     title,
-    dueDate: "",
+    dueDate,
+    dueLabel: options.dueLabel || (dueDate ? parsedDue.label : "期限なし"),
+    dueSource: options.dueSource || parsedDue.source || "",
     estimatedMinutes: "unknown",
     exp: 20,
     completed: false,
@@ -1455,6 +1622,18 @@ function createProjectTask(projectId, milestoneId, title, options = {}) {
     project.tasks.push(task);
   }
   return task;
+}
+
+function addProjectTaskToToday(taskId) {
+  const found = findProjectTask(taskId);
+  if (!found || found.task.completed) return;
+  const daily = getToday();
+  daily.projectTaskIds = daily.projectTaskIds || [];
+  if (!daily.projectTaskIds.includes(taskId)) daily.projectTaskIds.push(taskId);
+  found.task.addedToToday = true;
+  state.managerComment = "今日やるProjectに入れた。見える場所に置いたなら、あとは動くだけだな。";
+  saveState();
+  renderAll();
 }
 
 function createLifeTask(title, lifeArea, options = {}) {
@@ -1492,6 +1671,8 @@ function completeProjectTask(taskId, source) {
     source,
     category: "project",
     type: "normal",
+    dueDate: task.dueDate || "",
+    dueLabel: task.dueLabel || "期限なし",
     completedAt: new Date().toISOString()
   });
   state.questHistory.push({
@@ -1507,6 +1688,8 @@ function completeProjectTask(taskId, source) {
     category: "project",
     type: "normal",
     source,
+    dueDate: task.dueDate || "",
+    dueLabel: task.dueLabel || "期限なし",
     completedAt: new Date().toISOString(),
     createdAt: new Date().toISOString()
   });
@@ -1832,6 +2015,7 @@ function renderAll() {
   renderSkills();
   renderProjects();
   renderInbox();
+  renderDueReminders();
   renderManualQuests();
   renderRatingGrid();
   renderEnglishLogs();
@@ -1965,6 +2149,7 @@ function renderTodayProjectTask(task) {
       <div>
         <span class="quest-tag">Project / ${escapeHtml(project.name)}</span>
         <h3>${escapeHtml(task.title)}</h3>
+        ${renderDueMeta(task)}
       </div>
       <div class="quest-side">
         <strong>+${task.exp} EXP</strong>
@@ -2018,8 +2203,40 @@ function renderProjectCard(project) {
         <input data-milestone-deadline="${escapeHtml(project.id)}" type="date" />
         <button class="secondary-btn compact" data-add-milestone="${escapeHtml(project.id)}">追加</button>
       </div>
+      ${renderProjectInboxCandidates(project)}
       ${renderProjectLooseTasks(project)}
       ${(project.milestones || []).map((milestone) => renderMilestone(project, milestone)).join("")}
+    </article>
+  `;
+}
+
+function renderProjectInboxCandidates(project) {
+  const candidates = getProjectInboxCandidates(project.id);
+  if (!candidates.length) return "";
+  return `
+    <section class="milestone-card project-inbox-candidates">
+      <div class="skill-card-head">
+        <div>
+          <h4>Inbox候補</h4>
+          <small>Projectに関係しそうなメモ。必要ならTask化できます。</small>
+        </div>
+        <span class="quest-tag">${candidates.length}件</span>
+      </div>
+      ${candidates.map((item) => renderProjectInboxCandidate(item, project)).join("")}
+    </section>
+  `;
+}
+
+function renderProjectInboxCandidate(item, project) {
+  return `
+    <article class="manual-quest inbox-candidate">
+      <span>Inbox / ${escapeHtml(project.name)}</span>
+      <b>${escapeHtml(item.title)}</b>
+      ${renderDueMeta(item)}
+      <div class="inline-actions">
+        <button class="secondary-btn compact" data-inbox-task="${escapeHtml(item.id)}">Task化</button>
+        <button class="primary-btn compact" data-inbox-today="${escapeHtml(item.id)}">今日やる</button>
+      </div>
     </article>
   `;
 }
@@ -2064,8 +2281,12 @@ function renderProjectTask(task) {
     <article class="manual-quest ${task.completed ? "is-done" : ""}">
       <span>${task.addedToToday ? "今日やる" : "Project"}</span>
       <b>${escapeHtml(task.title)}</b>
+      ${renderDueMeta(task)}
       <em>+${task.exp} EXP</em>
-      <button class="secondary-btn compact" data-complete-project-task="${escapeHtml(task.id)}" ${task.completed ? "disabled" : ""}>${task.completed ? "完了済み" : "完了"}</button>
+      <div class="inline-actions">
+        <button class="secondary-btn compact" data-add-project-task-today="${escapeHtml(task.id)}" ${task.addedToToday || task.completed ? "disabled" : ""}>${task.addedToToday ? "今日入り" : "今日やる"}</button>
+        <button class="secondary-btn compact" data-complete-project-task="${escapeHtml(task.id)}" ${task.completed ? "disabled" : ""}>${task.completed ? "完了済み" : "完了"}</button>
+      </div>
     </article>
   `;
 }
@@ -2085,11 +2306,13 @@ function renderInbox() {
 }
 
 function renderInboxItem(item) {
+  const canProjectTask = item.status !== "converted" && item.domain === "project" && item.projectId;
   return `
     <article class="inbox-item ${item.status === "converted" ? "is-done" : ""}">
       <div>
         <span class="quest-tag">${escapeHtml(domainLabel(item.domain))}${item.status === "converted" ? " / 変換済み" : ""}</span>
         <h3>${escapeHtml(item.title)}</h3>
+        ${renderDueMeta(item)}
       </div>
       <div class="inbox-controls">
         <select data-inbox-field="domain" data-inbox-id="${escapeHtml(item.id)}">
@@ -2107,11 +2330,50 @@ function renderInboxItem(item) {
           <option value="">Lifeなし</option>
           ${Object.entries(lifeAreas).map(([id, label]) => `<option value="${id}" ${item.lifeArea === id ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
         </select>
+        ${canProjectTask ? `<button class="secondary-btn compact" data-inbox-task="${escapeHtml(item.id)}">Task化</button>` : ""}
         <button class="secondary-btn compact" data-inbox-today="${escapeHtml(item.id)}" ${item.status === "converted" ? "disabled" : ""}>今日やる</button>
         <button class="danger-btn compact" data-inbox-remove="${escapeHtml(item.id)}">削除</button>
       </div>
     </article>
   `;
+}
+
+function renderDueReminders() {
+  if (!dom.dueReminderList) return;
+  const items = getDueReminderItems().slice(0, 6);
+  dom.dueReminderList.innerHTML = items.length
+    ? items.map(renderDueReminderCard).join("")
+    : `<div class="mini-empty">期限付きのProject候補はまだありません。Inboxに「8月25日までに文献をまとめる」みたいに入れると、ここに出ます。</div>`;
+}
+
+function renderDueReminderCard(entry) {
+  const project = state.projects[entry.projectId] || { name: "Project", color: "#94a3b8" };
+  const urgency = dueUrgencyLabel(entry.dueDate);
+  const action = entry.kind === "milestone"
+    ? `<span class="limit-note">Milestone</span>`
+    : entry.kind === "inbox"
+      ? `<button class="secondary-btn compact" data-reminder-inbox-task="${escapeHtml(entry.id)}">Task化</button>
+         <button class="primary-btn compact" data-reminder-inbox-today="${escapeHtml(entry.id)}">今日やる</button>`
+      : `<button class="secondary-btn compact" data-reminder-project-today="${escapeHtml(entry.id)}" ${entry.addedToToday ? "disabled" : ""}>${entry.addedToToday ? "今日入り" : "今日やる"}</button>
+         <button class="secondary-btn compact" data-reminder-project-complete="${escapeHtml(entry.id)}" ${entry.completed ? "disabled" : ""}>完了</button>`;
+  const kindLabel = { inbox: "Inbox候補", project: "Project", milestone: "Milestone" }[entry.kind] || "Project";
+  return `
+    <article class="reminder-card ${urgency.className}" style="--skill: ${project.color}">
+      <div>
+        <span class="quest-tag">${escapeHtml(project.name)} / ${escapeHtml(kindLabel)}</span>
+        <h3>${escapeHtml(entry.title)}</h3>
+        ${renderDueMeta(entry)}
+        <small>${escapeHtml(urgency.label)}</small>
+      </div>
+      <div class="inline-actions">${action}</div>
+    </article>
+  `;
+}
+
+function renderDueMeta(item) {
+  const label = item.dueLabel || (item.dueDate ? formatDueDate(item.dueDate) : "期限なし");
+  const className = item.dueDate ? dueUrgencyLabel(item.dueDate).className : "is-none";
+  return `<small class="due-label ${className}">${escapeHtml(label)}</small>`;
 }
 
 function renderSkillMini() {
@@ -2260,13 +2522,19 @@ function getLogOwnerName(log) {
 function mergeProjects(existingProjects) {
   const merged = structuredCloneSafe(projectSeeds);
   Object.entries(existingProjects || {}).forEach(([id, project]) => {
+    const seedMilestones = merged[id]?.milestones || [];
+    const existingMilestones = project.milestones || [];
+    const milestoneIds = new Set(existingMilestones.map((milestone) => milestone.id));
     merged[id] = {
       ...(merged[id] || {}),
       ...project,
       exp: project.exp ?? project.progress ?? merged[id]?.exp ?? 0,
       progress: project.progress ?? 0,
       status: project.status || "active",
-      milestones: project.milestones || merged[id]?.milestones || [],
+      milestones: [
+        ...existingMilestones,
+        ...seedMilestones.filter((milestone) => !milestoneIds.has(milestone.id))
+      ],
       tasks: project.tasks || []
     };
     if (id === "graduation_thesis" && project.goal === "12月提出に向けて、8月末までに分析の目処をつける") {
@@ -2309,6 +2577,66 @@ function getTodayProjectTasks() {
 function getTodayLifeTasks() {
   const ids = new Set(getToday()?.lifeTaskIds || []);
   return (state.lifeTasks || []).filter((task) => ids.has(task.id));
+}
+
+function getProjectInboxCandidates(projectId) {
+  return (state.inboxItems || [])
+    .filter((item) => item.status !== "converted" && item.domain === "project" && item.projectId === projectId)
+    .sort(compareDueItems);
+}
+
+function getDueReminderItems() {
+  const projectInbox = (state.inboxItems || [])
+    .filter((item) => item.status !== "converted" && item.domain === "project" && item.projectId && item.dueDate)
+    .map((item) => ({ ...item, kind: "inbox" }));
+  const projectTasks = Object.values(state.projects || {})
+    .flatMap((project) => getProjectTasks(project))
+    .filter((task) => !task.completed && task.dueDate)
+    .map((task) => ({ ...task, kind: "project" }));
+  const milestones = Object.values(state.projects || {})
+    .flatMap((project) =>
+      (project.milestones || [])
+        .filter((milestone) => milestone.status !== "done" && milestone.deadline)
+        .map((milestone) => ({
+          id: milestone.id,
+          kind: "milestone",
+          projectId: project.id,
+          title: milestone.title,
+          dueDate: milestone.deadline,
+          dueLabel: formatDueDate(milestone.deadline),
+          createdAt: milestone.deadline
+        }))
+    );
+  return [...projectInbox, ...projectTasks, ...milestones].sort(compareDueItems);
+}
+
+function compareDueItems(a, b) {
+  const aDate = a.dueDate || "9999-12-31";
+  const bDate = b.dueDate || "9999-12-31";
+  if (aDate !== bDate) return aDate.localeCompare(bDate);
+  const aPriority = state.projects?.[a.projectId]?.priority || 99;
+  const bPriority = state.projects?.[b.projectId]?.priority || 99;
+  if (aPriority !== bPriority) return aPriority - bPriority;
+  return String(a.createdAt || "").localeCompare(String(b.createdAt || ""));
+}
+
+function formatDueDate(dateKey) {
+  if (!dateKey) return "期限なし";
+  const date = new Date(`${dateKey}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateKey;
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
+function dueUrgencyLabel(dateKey) {
+  if (!dateKey) return { label: "期限なし", className: "is-none" };
+  const today = startOfDay(new Date());
+  const due = startOfDay(new Date(`${dateKey}T00:00:00`));
+  const diff = Math.round((due - today) / 86400000);
+  if (diff < 0) return { label: `${Math.abs(diff)}日過ぎています`, className: "is-overdue" };
+  if (diff === 0) return { label: "今日まで", className: "is-today" };
+  if (diff === 1) return { label: "明日まで", className: "is-soon" };
+  if (diff <= 7) return { label: `あと${diff}日`, className: "is-soon" };
+  return { label: `あと${diff}日`, className: "is-future" };
 }
 
 function getTodayProjectExp() {

@@ -11,8 +11,8 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./icon.svg" />
-    <link rel="stylesheet" href="./styles.css?v=road-level-up-pwa7" />
-    <script src="./app.js?v=road-level-up-pwa7" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=road-level-up-pwa8" />
+    <script src="./app.js?v=road-level-up-pwa8" defer></script>
   </head>
   <body>
     <div class="app">
@@ -79,6 +79,17 @@
               <textarea id="homeInboxInput" rows="4" placeholder="例：&#10;卒論PDFを読む&#10;先生にメールする&#10;洗濯する"></textarea>
             </label>
             <div class="inbox-preview" id="homeInboxPreview"></div>
+          </section>
+
+          <section class="panel reminder-panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Deadline Reminder</p>
+                <h2>期限リマインド</h2>
+              </div>
+              <span class="limit-note">Project優先</span>
+            </div>
+            <div class="reminder-list" id="dueReminderList"></div>
           </section>
 
           <section class="panel now-panel">

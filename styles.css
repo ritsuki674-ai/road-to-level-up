@@ -613,6 +613,47 @@ textarea:focus {
   font-weight: 900;
 }
 
+.due-label {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.due-label.is-today,
+.due-label.is-overdue,
+.reminder-card.is-today,
+.reminder-card.is-overdue {
+  border-color: rgba(255, 125, 69, 0.62);
+}
+
+.due-label.is-today,
+.due-label.is-overdue {
+  color: #ffcf8a;
+}
+
+.due-label.is-soon,
+.reminder-card.is-soon {
+  border-color: rgba(255, 207, 138, 0.5);
+}
+
+.due-label.is-none {
+  opacity: 0.62;
+}
+
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .project-add-row,
 .inbox-controls {
   display: grid;
@@ -650,6 +691,44 @@ textarea:focus {
 
 .inbox-item h3 {
   margin: 8px 0 0;
+}
+
+.reminder-list {
+  display: grid;
+  gap: 10px;
+}
+
+.reminder-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--skill);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.reminder-card h3 {
+  margin: 8px 0 0;
+}
+
+.reminder-card small:not(.due-label) {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.project-inbox-candidates {
+  border-color: rgba(255, 207, 138, 0.24);
+  background: rgba(255, 207, 138, 0.055);
+}
+
+.inbox-candidate {
+  display: grid;
+  gap: 8px;
 }
 
 .inline-check {
@@ -796,7 +875,8 @@ textarea:focus {
   }
 
   .project-add-row,
-  .inbox-controls {
+  .inbox-controls,
+  .reminder-card {
     grid-template-columns: 1fr;
   }
 }
@@ -820,6 +900,7 @@ textarea:focus {
   .quest-card,
   .now-suggestion-card,
   .manual-quest,
+  .reminder-card,
   .inbox-item,
   .section-head,
   .skill-card-head {

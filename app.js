@@ -1,5 +1,5 @@
 const STORAGE_KEY = "road-to-level-up-mvp-v1";
-const APP_VERSION = "road-level-up-pwa8";
+const APP_VERSION = "road-level-up-pwa9";
 
 const levelTable = [
   { level: 1, exp: 0 },
@@ -455,6 +455,7 @@ function bindEvents() {
   dom.inboxList?.addEventListener("click", handleInboxClick);
   dom.inboxList?.addEventListener("change", handleInboxChange);
   dom.projectList?.addEventListener("click", handleProjectClick);
+  dom.projectList?.addEventListener("change", handleProjectChange);
   dom.dueReminderList?.addEventListener("click", handleDueReminderClick);
   dom.nowSuggestBtn.addEventListener("click", handleNowSuggest);
   dom.nowSuggestionList.addEventListener("click", handleNowCompleteClick);
@@ -733,6 +734,12 @@ function classifyInboxTitle(title) {
 }
 
 function handleInboxChange(event) {
+  const dueInput = event.target.closest("[data-inbox-due]");
+  if (dueInput) {
+    updateInboxDueDate(dueInput.dataset.inboxDue, dueInput.value);
+    return;
+  }
+
   const field = event.target.closest("[data-inbox-field]");
   if (!field) return;
   const item = state.inboxItems.find((entry) => entry.id === field.dataset.inboxId);
@@ -744,6 +751,16 @@ function handleInboxChange(event) {
     if (field.value !== "project") item.projectId = "";
     if (field.value !== "life") item.lifeArea = "";
   }
+  saveState();
+  renderAll();
+}
+
+function updateInboxDueDate(inboxId, dueDate) {
+  const item = state.inboxItems.find((entry) => entry.id === inboxId);
+  if (!item) return;
+  item.dueDate = dueDate || "";
+  item.dueLabel = dueDate ? formatDueDate(dueDate) : "期限なし";
+  item.dueSource = dueDate ? "manual" : "";
   saveState();
   renderAll();
 }
@@ -1592,7 +1609,19 @@ function handleProjectClick(event) {
   const complete = event.target.closest("[data-complete-project-task]");
   if (complete) {
     completeProjectTask(complete.dataset.completeProjectTask, "project");
+    return;
   }
+
+  const remove = event.target.closest("[data-delete-project-task]");
+  if (remove) {
+    deleteProjectTask(remove.dataset.deleteProjectTask);
+  }
+}
+
+function handleProjectChange(event) {
+  const dueInput = event.target.closest("[data-project-task-due]");
+  if (!dueInput) return;
+  updateProjectTaskDueDate(dueInput.dataset.projectTaskDue, dueInput.value);
 }
 
 function createProjectTask(projectId, milestoneId, title, options = {}) {
@@ -1632,6 +1661,42 @@ function addProjectTaskToToday(taskId) {
   if (!daily.projectTaskIds.includes(taskId)) daily.projectTaskIds.push(taskId);
   found.task.addedToToday = true;
   state.managerComment = "今日やるProjectに入れた。見える場所に置いたなら、あとは動くだけだな。";
+  saveState();
+  renderAll();
+}
+
+function updateProjectTaskDueDate(taskId, dueDate) {
+  const found = findProjectTask(taskId);
+  if (!found) return;
+  found.task.dueDate = dueDate || "";
+  found.task.dueLabel = dueDate ? formatDueDate(dueDate) : "期限なし";
+  found.task.dueSource = dueDate ? "manual" : "";
+  state.managerComment = dueDate
+    ? "期限を入れた。忘れる前提で仕組みに置く、いい判断だ。"
+    : "期限を外した。締切がないなら、焦らず置いとけ。";
+  saveState();
+  renderAll();
+}
+
+function deleteProjectTask(taskId) {
+  const found = findProjectTask(taskId);
+  if (!found) return;
+  const { project, milestone, task } = found;
+  if (milestone) {
+    milestone.tasks = (milestone.tasks || []).filter((item) => item.id !== taskId);
+    updateMilestoneStatus(milestone);
+  } else {
+    project.tasks = (project.tasks || []).filter((item) => item.id !== taskId);
+  }
+  Object.values(state.daily || {}).forEach((daily) => {
+    daily.projectTaskIds = (daily.projectTaskIds || []).filter((id) => id !== taskId);
+  });
+  if (state.nowMode?.suggestedQuests) {
+    state.nowMode.suggestedQuests = state.nowMode.suggestedQuests.filter((quest) => quest.questId !== taskId);
+  }
+  state.managerComment = task.completed
+    ? "完了済みタスクを整理した。記録は残る、表示だけ片づけたってことだ。"
+    : "Projectタスクを削除した。いらない球はベンチに戻せばいい。";
   saveState();
   renderAll();
 }
@@ -2233,6 +2298,7 @@ function renderProjectInboxCandidate(item, project) {
       <span>Inbox / ${escapeHtml(project.name)}</span>
       <b>${escapeHtml(item.title)}</b>
       ${renderDueMeta(item)}
+      ${renderDueEditor("inbox", item.id, item.dueDate)}
       <div class="inline-actions">
         <button class="secondary-btn compact" data-inbox-task="${escapeHtml(item.id)}">Task化</button>
         <button class="primary-btn compact" data-inbox-today="${escapeHtml(item.id)}">今日やる</button>
@@ -2282,10 +2348,12 @@ function renderProjectTask(task) {
       <span>${task.addedToToday ? "今日やる" : "Project"}</span>
       <b>${escapeHtml(task.title)}</b>
       ${renderDueMeta(task)}
+      ${renderDueEditor("project", task.id, task.dueDate, task.completed)}
       <em>+${task.exp} EXP</em>
       <div class="inline-actions">
         <button class="secondary-btn compact" data-add-project-task-today="${escapeHtml(task.id)}" ${task.addedToToday || task.completed ? "disabled" : ""}>${task.addedToToday ? "今日入り" : "今日やる"}</button>
         <button class="secondary-btn compact" data-complete-project-task="${escapeHtml(task.id)}" ${task.completed ? "disabled" : ""}>${task.completed ? "完了済み" : "完了"}</button>
+        <button class="danger-btn compact" data-delete-project-task="${escapeHtml(task.id)}">削除</button>
       </div>
     </article>
   `;
@@ -2313,6 +2381,7 @@ function renderInboxItem(item) {
         <span class="quest-tag">${escapeHtml(domainLabel(item.domain))}${item.status === "converted" ? " / 変換済み" : ""}</span>
         <h3>${escapeHtml(item.title)}</h3>
         ${renderDueMeta(item)}
+        ${renderDueEditor("inbox", item.id, item.dueDate, item.status === "converted")}
       </div>
       <div class="inbox-controls">
         <select data-inbox-field="domain" data-inbox-id="${escapeHtml(item.id)}">
@@ -2374,6 +2443,16 @@ function renderDueMeta(item) {
   const label = item.dueLabel || (item.dueDate ? formatDueDate(item.dueDate) : "期限なし");
   const className = item.dueDate ? dueUrgencyLabel(item.dueDate).className : "is-none";
   return `<small class="due-label ${className}">${escapeHtml(label)}</small>`;
+}
+
+function renderDueEditor(kind, id, value, disabled = false) {
+  const attr = kind === "project" ? "data-project-task-due" : "data-inbox-due";
+  return `
+    <label class="due-editor">
+      <span>期限</span>
+      <input ${attr}="${escapeHtml(id)}" type="date" value="${escapeHtml(value || "")}" ${disabled ? "disabled" : ""} />
+    </label>
+  `;
 }
 
 function renderSkillMini() {

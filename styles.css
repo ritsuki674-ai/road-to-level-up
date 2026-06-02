@@ -654,6 +654,19 @@ textarea:focus {
   align-items: center;
 }
 
+.due-editor {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.due-editor input {
+  width: min(100%, 220px);
+}
+
 .project-add-row,
 .inbox-controls {
   display: grid;
